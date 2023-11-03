@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net7.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <PackageIcon>huflit-logo.png</PackageIcon>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DocumentationFile>bin\Release\ClassRegisterApp.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Folder Include="Models\"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.54"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1"/>
+        <PackageReference Include="MongoDB.Bson" Version="2.22.0"/>
+        <PackageReference Include="MongoDB.Driver" Version="2.22.0"/>
+        <PackageReference Include="MongoDB.Driver.Core" Version="2.22.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+    </ItemGroup>
+
+</Project>

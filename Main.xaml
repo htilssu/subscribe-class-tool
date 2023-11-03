@@ -1,0 +1,39 @@
+﻿<Window x:Class="ClassRegisterApp.Main"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Icon="D:\projects\C# WPF\ClassRegisterApp\Images\huflit-logo.png"
+        Title="Đăng ký môn HUFLIT" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="30">
+            <ListBox Name="LboxInfo" Height="300" HorizontalAlignment="Stretch" />
+        </StackPanel>
+        <StackPanel Margin="30" Width="300" Grid.Column="1">
+            <RichTextBox Name="RtbClassList" Height="100">
+                <RichTextBox.Resources>
+                    <Style TargetType="{x:Type Paragraph}">
+                        <Setter Property="Margin" Value="0" />
+                    </Style>
+                </RichTextBox.Resources>
+            </RichTextBox>
+            <Button Name="btnRun" Click="BtnRun_OnClick" Width="100" Height="30" Margin="0,10,0,0" FontSize="14"
+                    FontWeight="700" Foreground="White"
+                    Background="Gray">
+                Run
+            </Button>
+
+            <Label HorizontalContentAlignment="Center" FontSize="20" Foreground="DarkRed" Margin="15" Name="HiLabel" />
+            <Button Visibility="Hidden" Name="BtnLogout" Width="100" Height="30" Padding="0" Margin="0">Đăng Xuất</Button>
+        </StackPanel>
+    </Grid>
+</Window>
