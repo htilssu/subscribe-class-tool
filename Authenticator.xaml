@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Đăng ký môn HUFLIT" Height="360" Width="450">
+        Title="Đăng ký môn HUFLIT" Height="360" Width="450" x:ClassModifier="internal">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="100" />
@@ -13,14 +13,14 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Image Source="D:\projects\C# WPF\ClassRegisterApp\Images\huflit-logo.png" />
+        <Image Name="AuthImage" />
         <StackPanel Margin="50,5" Grid.ColumnSpan="1" Grid.Row="1">
             <Label>Code:</Label>
             <TextBox FontSize="16" Height="25" Name="CodeTextBox" />
             <Label>UserName:</Label>
             <TextBox FontSize="16" Height="25" Name="UserNameTextBox" />
             <Label>Password:</Label>
-            <PasswordBox FontSize="16" Height="25" Name="PasswordTextBox"  />
+            <PasswordBox KeyDown="OnEnterLogin" FontSize="16" Height="25" Name="PasswordTextBox" />
             <Button Click="LogButton_OnClick" Content="Login" Name="LogButton" FontWeight="700" Foreground="White"
                     Background="Gray" Margin="0,15,0,0" Width="100" Height="30">
                 <Button.Template>

@@ -2,10 +2,20 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net7.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
         <PackageIcon>huflit-logo.png</PackageIcon>
+        <LangVersion>12</LangVersion>
+        <ApplicationIcon>Images\huflit-logo.ico</ApplicationIcon>
+        <TargetFramework>net7.0-windows</TargetFramework>
+        <Title>A application for regist course huflit</Title>
+        <Authors>Hisu</Authors>
+        <Description>A application for regist course huflit</Description>
+        <Copyright>Hisu</Copyright>
+        <PackageReleaseNotes>A application for regist course huflit</PackageReleaseNotes>
+        <Company>Hisu</Company>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -19,12 +29,22 @@
 
     <ItemGroup>
         <PackageReference Include="HtmlAgilityPack" Version="1.11.54"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1"/>
         <PackageReference Include="MongoDB.Bson" Version="2.22.0"/>
-        <PackageReference Include="MongoDB.Driver" Version="2.22.0"/>
-        <PackageReference Include="MongoDB.Driver.Core" Version="2.22.0"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <None Remove="Images\huflit-logo.ico"/>
+        <EmbeddedResource Include="Images\huflit-logo.ico">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="Images\huflit-logo.png"/>
+        <EmbeddedResource Include="Images\huflit-logo.png">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="huflit-logo.png"/>
+        <EmbeddedResource Include="huflit-logo.png"/>
     </ItemGroup>
 
 </Project>

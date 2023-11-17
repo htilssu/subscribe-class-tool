@@ -44,23 +44,7 @@
               "target": "Package",
               "version": "[1.11.54, )"
             },
-            "Microsoft.Extensions.DependencyInjection": {
-              "target": "Package",
-              "version": "[7.0.0, )"
-            },
-            "Microsoft.Extensions.Hosting": {
-              "target": "Package",
-              "version": "[7.0.1, )"
-            },
             "MongoDB.Bson": {
-              "target": "Package",
-              "version": "[2.22.0, )"
-            },
-            "MongoDB.Driver": {
-              "target": "Package",
-              "version": "[2.22.0, )"
-            },
-            "MongoDB.Driver.Core": {
               "target": "Package",
               "version": "[2.22.0, )"
             },
@@ -88,7 +72,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }

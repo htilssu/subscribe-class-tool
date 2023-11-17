@@ -30,6 +30,7 @@ internal class HuflitPortal
     private Dictionary<string, string> _classHideId = new();
 
     private string _cookie = "";
+
     private string? _studentId;
 
 
@@ -46,6 +47,8 @@ internal class HuflitPortal
         _studentId = studentId;
     }
 
+    public int Delay { get; set; } = 0;
+
     public string UserName { get; }
 
 
@@ -60,6 +63,7 @@ internal class HuflitPortal
         var subjectIdList = await GetSubjectIdList();
         if (classListCode == null) return;
         _classHideId = await GetHideId(subjectIdList!);
+        await Task.Delay(Delay);
         await RegisterSubject(classListCode, _classHideId);
     }
 
@@ -74,6 +78,7 @@ internal class HuflitPortal
         var subjectIdList = await GetSubjectIdList();
         if (classListCode == null || subjectIdList == null) return;
         _classHideId = await GetHideId(subjectIdList);
+        await Task.Delay(Delay);
         await RegisterSubject(classListCode, _classHideId, listBox);
     }
 
@@ -94,7 +99,7 @@ internal class HuflitPortal
                 foreach (var value in cookieValue!)
                 {
                     var cookie = value.Split(';')[0];
-                    // Console.WriteLine(cookie);
+                    // Console.WriteLine(value);
                     _cookie = $"{value}";
                 }
 

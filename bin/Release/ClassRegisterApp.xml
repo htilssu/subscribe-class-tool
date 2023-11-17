@@ -26,9 +26,6 @@
             <summary>
                 Interaction logic for MainWindow.xaml
             </summary>
-            <summary>
-            Authenticator
-            </summary>
         </member>
         <member name="M:ClassRegisterApp.Authenticator.InitializeComponent">
             <summary>
@@ -100,19 +97,28 @@
         <member name="T:ClassRegisterApp.Main">
             <summary>
             </summary>
-            <summary>
-            Main
-            </summary>
         </member>
-        <member name="M:ClassRegisterApp.Main.#ctor(ClassRegisterApp.User)">
+        <member name="M:ClassRegisterApp.Main.#ctor(ClassRegisterApp.User,ClassRegisterApp.Code)">
             <summary>
             </summary>
             <param name="user"></param>
+            <param name="code"></param>
         </member>
         <member name="M:ClassRegisterApp.Main.InitializeComponent">
             <summary>
             InitializeComponent
             </summary>
+        </member>
+        <member name="T:ClassRegisterApp.User">
+            <summary>
+                A user object contain username and password
+            </summary>
+        </member>
+        <member name="M:ClassRegisterApp.User.#ctor(System.String,System.String)">
+            <summary>
+            </summary>
+            <param name="userName">Username to login</param>
+            <param name="password">Password to login</param>
         </member>
     </members>
 </doc>

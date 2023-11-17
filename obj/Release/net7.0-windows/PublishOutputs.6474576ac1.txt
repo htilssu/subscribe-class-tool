@@ -36,6 +36,7 @@ D:\projects\C# WPF\ClassRegisterApp\bin\Release\net7.0-windows\publish\MongoDB.B
 D:\projects\C# WPF\ClassRegisterApp\bin\Release\net7.0-windows\publish\MongoDB.Driver.dll
 D:\projects\C# WPF\ClassRegisterApp\bin\Release\net7.0-windows\publish\MongoDB.Driver.Core.dll
 D:\projects\C# WPF\ClassRegisterApp\bin\Release\net7.0-windows\publish\MongoDB.Libmongocrypt.dll
+D:\projects\C# WPF\ClassRegisterApp\bin\Release\net7.0-windows\publish\Newtonsoft.Json.dll
 D:\projects\C# WPF\ClassRegisterApp\bin\Release\net7.0-windows\publish\SharpCompress.dll
 D:\projects\C# WPF\ClassRegisterApp\bin\Release\net7.0-windows\publish\Snappier.dll
 D:\projects\C# WPF\ClassRegisterApp\bin\Release\net7.0-windows\publish\ZstdSharp.dll

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Media.Imaging;
+﻿using System.Windows;
+using System.Windows.Input;
 
 namespace ClassRegisterApp;
 
 /// <summary>
 ///     Interaction logic for MainWindow.xaml
 /// </summary>
-public partial class Authenticator
+internal partial class Authenticator
 {
     private readonly CodeService _codeService;
     private User? _user;
@@ -16,24 +15,31 @@ public partial class Authenticator
     {
         InitializeComponent();
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        Icon = new BitmapImage(new Uri(@"D:\projects\C# WPF\ClassRegisterApp\Images\huflit-logo.ico"));
+        Icon = ImageHelper.GetEmbeddedImage("huflit-logo.ico");
+        AuthImage.Source = Icon;
+
         _codeService = new CodeService();
     }
 
 
     private async void LogButton_OnClick(object sender, RoutedEventArgs e)
     {
-        var status = await _codeService.CheckCode(CodeTextBox.Text);
+        var code = await _codeService.CheckCode(CodeTextBox.Text);
 
-        if (!status)
+        if (code == null)
         {
             MessageBox.Show("Code sai!!", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
         _user = new User(UserNameTextBox.Text, PasswordTextBox.Password);
-        var main = new Main(_user);
+        var main = new Main(_user, code);
         main.Show();
         Close();
+    }
+
+    private void OnEnterLogin(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter) LogButton_OnClick(sender, e);
     }
 }

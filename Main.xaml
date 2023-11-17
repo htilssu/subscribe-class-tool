@@ -4,8 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
-        Icon="D:\projects\C# WPF\ClassRegisterApp\Images\huflit-logo.png"
-        Title="Đăng ký môn HUFLIT" Height="450" Width="800">
+        Title="Đăng ký môn HUFLIT" Height="450" Width="800" x:ClassModifier="internal">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -33,7 +32,10 @@
             </Button>
 
             <Label HorizontalContentAlignment="Center" FontSize="20" Foreground="DarkRed" Margin="15" Name="HiLabel" />
-            <Button Visibility="Hidden" Name="BtnLogout" Width="100" Height="30" Padding="0" Margin="0">Đăng Xuất</Button>
+            <Button Click="BtnLogout_OnClick" Visibility="Hidden" Name="BtnLogout" Width="100" Height="30" Padding="0"
+                    Margin="0">
+                Đăng Xuất
+            </Button>
         </StackPanel>
     </Grid>
 </Window>
