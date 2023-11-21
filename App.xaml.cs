@@ -7,7 +7,8 @@ namespace ClassRegisterApp;
 /// </summary>
 public partial class App
 {
-    protected override async void OnStartup(StartupEventArgs e)
+    /// <inheritdoc />
+    protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
     }

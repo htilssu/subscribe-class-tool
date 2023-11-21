@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -19,7 +20,11 @@ internal class HuflitPortal
     /// <remarks>key: classCode | value: dictionary child class code</remarks>
     private readonly Dictionary<string, Dictionary<string, string>> _classChild = new();
 
-    private readonly HttpClient _client = new();
+    private readonly HttpClient _client = new()
+    {
+        Timeout = TimeSpan.FromHours(1)
+    };
+
     private readonly string _password;
     private readonly string _url = @"https://portal.huflit.edu.vn";
 
@@ -31,8 +36,6 @@ internal class HuflitPortal
 
     private string _cookie = "";
 
-    private string? _studentId;
-
 
     public HuflitPortal(string userName, string password)
     {
@@ -40,14 +43,8 @@ internal class HuflitPortal
         _password = password;
     }
 
-    public HuflitPortal(string userName, string password, string? studentId)
-    {
-        UserName = userName;
-        _password = password;
-        _studentId = studentId;
-    }
 
-    public int Delay { get; set; } = 0;
+    public int Delay { get; init; }
 
     public string UserName { get; }
 
@@ -55,7 +52,7 @@ internal class HuflitPortal
     /// <summary>
     ///     Start register course
     /// </summary>
-    /// <remarks>You must call <see cref="ConnectToDKMH" /> before registry course</remarks>
+    /// <remarks>You must call <see cref="ConnectToDkmh" /> before registry course</remarks>
     /// <param name="path">path that link to class list folder</param>
     public async Task Run(string path)
     {
@@ -70,7 +67,7 @@ internal class HuflitPortal
     /// <summary>
     ///     Start registry course
     /// </summary>
-    /// <remarks>You must call <see cref="ConnectToDKMH" /> before registry course</remarks>
+    /// <remarks>You must call <see cref="ConnectToDkmh" /> before registry course</remarks>
     /// <param name="classListCode">List of class code</param>
     /// <param name="listBox"></param>
     public async Task Run(List<string>? classListCode, ListBox listBox)
@@ -80,6 +77,111 @@ internal class HuflitPortal
         _classHideId = await GetHideId(subjectIdList);
         await Task.Delay(Delay);
         await RegisterSubject(classListCode, _classHideId, listBox);
+    }
+
+    /// <summary>
+    ///     Single registry (when a request get successfully hideId)
+    /// </summary>
+    /// <param name="classListCode"></param>
+    /// <param name="listBox"></param>
+    public async Task RunOptimized(List<string>? classListCode, ListBox listBox)
+    {
+        var subjectIdList = await GetSubjectIdList();
+        if (classListCode == null || subjectIdList == null) return;
+        // _classHideId = await GetHideId(subjectIdList);
+        // await Task.Delay(Delay);
+        // await RegisterSubject(classListCode, _classHideId, listBox);
+        await RegistSubject(subjectIdList, classListCode, listBox);
+    }
+
+    private async Task RegistSubject(List<string> subjectIdList, List<string> classListCode, ListBox listBox)
+    {
+        var tasks = subjectIdList.Select(Body).ToList();
+        await Task.WhenAll(tasks);
+        return;
+
+
+        async Task Body(string classId)
+        {
+            var hideId = new Dictionary<string, string>();
+            var childHide = new Dictionary<string, Dictionary<string, string>>();
+            _client.Timeout = TimeSpan.FromMinutes(20);
+            var response =
+                await _client.GetAsync(
+                    $"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachLopHocPhan?id={classId}&registType=KH");
+
+            var content = await response.Content.ReadAsStringAsync();
+            var contentDocument = new HtmlDocument();
+            contentDocument.LoadHtml(content);
+
+            var inputList = contentDocument.DocumentNode.SelectNodes("//form//tbody//input[@type='radio']");
+
+            if (inputList != null)
+                foreach (var node in inputList)
+                {
+                    var secret = node.GetAttributeValue("id", "");
+                    var onClickAttributeValue = node.GetAttributeValue("onclick", "");
+                    var childHideIdDictionary = new Dictionary<string, string>();
+                    var classCode = "";
+                    if (onClickAttributeValue != "")
+                    {
+                        classCode = GetFirstStringInJavaScripts(onClickAttributeValue);
+                        var childList =
+                            contentDocument.DocumentNode.SelectNodes(
+                                $"//form//tr[@id='tr-of-{classCode}']//input[@type='radio']");
+
+                        var childClassList =
+                            contentDocument.DocumentNode.SelectNodes($"//form//tr[@id='tr-of-{classCode}']//tr");
+
+                        if (childList != null)
+                        {
+                            var index = 1;
+                            foreach (var child in childList)
+                            {
+                                var tdList = childClassList[index].SelectNodes(".//td");
+                                var childHideId = child.GetAttributeValue("id", "");
+                                if (childHideId != "") childHideIdDictionary.TryAdd(tdList[1].InnerText, childHideId);
+                                index++;
+                            }
+                        }
+                    }
+
+                    if (secret.Contains("tr-of-") || classCode == "") continue;
+                    hideId.TryAdd(classCode, secret);
+                    childHide.TryAdd(classCode, childHideIdDictionary);
+                }
+
+            foreach (var code in classListCode)
+                if (hideId.ContainsKey(code) || hideId.ContainsKey(code.Split('-')[0]))
+                {
+                    var registerHide = "";
+                    if (code.Contains('-'))
+                    {
+                        var split = code.Split('-');
+                        var LT = split[0];
+                        var TH = split[1];
+                        hideId.TryGetValue(LT, out var LTHideId);
+                        var isHasChildHide = childHide.TryGetValue(LT, out var dicChildHide);
+                        if (isHasChildHide)
+                        {
+                            dicChildHide!.TryGetValue(TH, out var THHideId);
+                            registerHide = LTHideId + "|" + THHideId + "|";
+                        }
+                    }
+                    else
+                    {
+                        hideId.TryGetValue(code, out var value);
+                        registerHide = value;
+                    }
+
+                    var responseRegistry = await _client.GetAsync(
+                        $"https://dkmh.huflit.edu.vn/DangKyHocPhan/RegistUpdateScheduleStudyUnit?Hide={registerHide}&ScheduleStudyUnitOld=&acceptConflict=");
+
+                    var status = await responseRegistry.Content.ReadFromJsonAsync<PortalResponseStatus>();
+                    listBox.Items.Add(status?.Msg + $" {code}");
+                    break;
+                }
+        }
     }
 
     /// <summary>
@@ -97,11 +199,7 @@ internal class HuflitPortal
             var hasCookie = response.Headers.TryGetValues("Set-Cookie", out var cookieValue);
             if (hasCookie)
                 foreach (var value in cookieValue!)
-                {
-                    var cookie = value.Split(';')[0];
-                    // Console.WriteLine(value);
                     _cookie = $"{value}";
-                }
 
 
             _client.DefaultRequestHeaders.Add("Cookie", _cookie);
@@ -125,7 +223,7 @@ internal class HuflitPortal
             var content = new MultipartFormDataContent();
             content.Add(new StringContent(UserName), "txtTaiKhoan");
             content.Add(new StringContent(_password), "txtMatKhau");
-            response = await _client.PostAsync(_url + "Login", content);
+            await _client.PostAsync(_url + "Login", content);
         }
 
         return HttpStatusCode.Redirect;
@@ -144,22 +242,24 @@ internal class HuflitPortal
     ///         <see cref="Login" />
     ///     </remarks>
     /// </summary>
-    public async Task ConnectToDKMH()
+    public async Task ConnectToDkmh()
     {
-        var responseMessage = await _client.GetAsync(_url + "/Home/DangKyHocPhan");
+        await _client.GetAsync(_url + "/Home/DangKyHocPhan");
     }
 
     private async Task RegisterSubject(List<string> subjectCode, Dictionary<string, string> hideId)
     {
         foreach (var code in subjectCode)
         {
-            var registerHide = "";
+            string registerHide;
             if (code.Contains('-'))
             {
                 var split = code.Split('-');
                 var LT = split[0];
                 var TH = split[1];
-                var THHideID = _classChild[LT][TH];
+                if (!_classChild.ContainsKey(LT) || !_classChild[LT].TryGetValue(TH, out var value)) return;
+
+                var THHideID = value;
                 registerHide = hideId[LT] + "|" + THHideID + "|";
             }
             else
@@ -262,11 +362,16 @@ internal class HuflitPortal
     /// </summary>
     /// <param name="subjectIdList">Subject id</param>
     /// <returns>Dictionary contain hideId</returns>
-    private async Task<Dictionary<string, string>> GetHideId(List<string> subjectIdList)
+    private async Task<Dictionary<string, string>> GetHideId(IEnumerable<string> subjectIdList)
     {
         var secretCode = new Dictionary<string, string>();
 
-        foreach (var classId in subjectIdList)
+        var tasks = subjectIdList.Select(Body).ToList();
+        await Task.WhenAll(tasks);
+
+        //Get hideId using loop
+
+        /*foreach (var classId in subjectIdList)
         {
             var response = await
                 _client.GetAsync(
@@ -312,10 +417,61 @@ internal class HuflitPortal
                     secretCode.TryAdd(classCode, secret);
                     _classChild.TryAdd(classCode, childHideIdDictionary);
                 }
-        }
+        }*/
 
 
         return secretCode;
+
+        async Task Body(string classId)
+        {
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("Cookie", _cookie);
+            var response =
+                await client.GetAsync(
+                    $"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachLopHocPhan?id={classId}&registType=KH");
+
+            var content = await response.Content.ReadAsStringAsync();
+            var contentDocument = new HtmlDocument();
+            contentDocument.LoadHtml(content);
+
+            var inputList = contentDocument.DocumentNode.SelectNodes("//form//tbody//input[@type='radio']");
+
+            if (inputList != null)
+                foreach (var node in inputList)
+                {
+                    var secret = node.GetAttributeValue("id", "");
+                    var onClickAttributeValue = node.GetAttributeValue("onclick", "");
+                    var childHideIdDictionary = new Dictionary<string, string>();
+                    var classCode = "";
+                    if (onClickAttributeValue != "")
+                    {
+                        classCode = GetFirstStringInJavaScripts(onClickAttributeValue);
+                        var childList =
+                            contentDocument.DocumentNode.SelectNodes(
+                                $"//form//tr[@id='tr-of-{classCode}']//input[@type='radio']");
+
+                        var childClassList =
+                            contentDocument.DocumentNode.SelectNodes($"//form//tr[@id='tr-of-{classCode}']//tr");
+
+                        if (childList != null)
+                        {
+                            var index = 1;
+                            foreach (var child in childList)
+                            {
+                                var tdList = childClassList[index].SelectNodes(".//td");
+                                var childHideId = child.GetAttributeValue("id", "");
+                                if (childHideId != "") childHideIdDictionary.TryAdd(tdList[1].InnerText, childHideId);
+                                index++;
+                            }
+                        }
+                    }
+
+                    if (secret.Contains("tr-of-") || classCode == "") continue;
+                    if (secretCode.ContainsKey(classCode)) continue;
+                    secretCode.TryAdd(classCode, secret);
+                    _classChild.TryAdd(classCode, childHideIdDictionary);
+                }
+        }
     }
 
     private string GetSubjectId(string href)

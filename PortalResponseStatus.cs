@@ -1,7 +1,28 @@
-﻿namespace ClassRegisterApp;
+﻿using System.Text.Json.Serialization;
 
+namespace ClassRegisterApp;
+
+/// <summary>
+///     Present Status response from server
+/// </summary>
 public class PortalResponseStatus
 {
-    public string Msg { get; set; }
-    public bool Status { get; set; }
+    /// <summary>
+    /// </summary>
+    /// <param name="msg"></param>
+    [JsonConstructor]
+    public PortalResponseStatus(string? msg)
+    {
+        Msg = msg;
+    }
+
+    /// <summary>
+    ///     Message
+    /// </summary>
+    public string? Msg { get; set; }
+
+    /// <summary>
+    ///     Http Status
+    /// </summary>
+    public bool? Status { get; set; }
 }

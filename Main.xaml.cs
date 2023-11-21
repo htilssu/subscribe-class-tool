@@ -30,6 +30,19 @@ internal partial class Main : Window
         HiLabel.Content = $"Hi {_huflitPortal.UserName.ToUpper()}";
     }
 
+    public Main()
+    {
+        _huflitPortal = new HuflitPortal("22DH114528", "Shuu2004")
+        {
+            Delay = 0
+        };
+        Login();
+        InitializeComponent();
+        WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        Icon = ImageHelper.GetEmbeddedImage("huflit-logo.ico");
+        HiLabel.Content = $"Hi {_huflitPortal.UserName.ToUpper()}";
+    }
+
     private async void Login()
     {
         var res = await _huflitPortal.Login();
@@ -41,16 +54,23 @@ internal partial class Main : Window
     {
         var listClass = new List<string>();
         if (RtbClassList.Document.ContentEnd == RtbClassList.Document.ContentStart) return;
-        
+
         var textRange = new TextRange(RtbClassList.Document.ContentStart, RtbClassList.Document.ContentEnd);
-        
+
         if (textRange.Text is not (null or ""))
             listClass.AddRange(
                 from lboxInfoItem in textRange.Text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
                 where lboxInfoItem is not null
                 select lboxInfoItem);
-        await _huflitPortal.ConnectToDKMH();
-        await _huflitPortal.Run(listClass, LboxInfo);
+        await _huflitPortal.ConnectToDkmh();
+        try
+        {
+            await _huflitPortal.RunOptimized(listClass, LboxInfo);
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show("Có lỗi hãy thử lại", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void BtnLogout_OnClick(object sender, RoutedEventArgs e)
