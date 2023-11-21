@@ -170,7 +170,7 @@ internal class HuflitPortal
             var response = await _client.GetAsync(
                 $"https://dkmh.huflit.edu.vn/DangKyHocPhan/RegistUpdateScheduleStudyUnit?Hide={registerHide}&ScheduleStudyUnitOld=&acceptConflict=");
 
-            var status = await response.Content.ReadFromJsonAsync<IPortalResponseStatus>();
+            var status = await response.Content.ReadFromJsonAsync<PortalResponseStatus>();
             Console.WriteLine(status?.Msg + $" {code}");
         }
     }
@@ -185,7 +185,7 @@ internal class HuflitPortal
     {
         foreach (var code in subjectCode)
         {
-            var registerHide = "";
+            string registerHide;
             if (code.Contains('-'))
             {
                 var split = code.Split('-');
@@ -202,7 +202,7 @@ internal class HuflitPortal
             var response = await _client.GetAsync(
                 $"https://dkmh.huflit.edu.vn/DangKyHocPhan/RegistUpdateScheduleStudyUnit?Hide={registerHide}&ScheduleStudyUnitOld=&acceptConflict=");
 
-            var status = await response.Content.ReadFromJsonAsync<IPortalResponseStatus>();
+            var status = await response.Content.ReadFromJsonAsync<PortalResponseStatus>();
             listBox.Items.Add(status?.Msg + $" {code}");
         }
     }
@@ -309,8 +309,8 @@ internal class HuflitPortal
 
                     if (secret.Contains("tr-of-") || classCode == "") continue;
                     if (secretCode.ContainsKey(classCode)) continue;
-                    secretCode.Add(classCode, secret);
-                    _classChild.Add(classCode, childHideIdDictionary);
+                    secretCode.TryAdd(classCode, secret);
+                    _classChild.TryAdd(classCode, childHideIdDictionary);
                 }
         }
 

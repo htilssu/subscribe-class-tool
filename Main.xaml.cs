@@ -40,7 +40,10 @@ internal partial class Main : Window
     private async void BtnRun_OnClick(object sender, RoutedEventArgs e)
     {
         var listClass = new List<string>();
+        if (RtbClassList.Document.ContentEnd == RtbClassList.Document.ContentStart) return;
+        
         var textRange = new TextRange(RtbClassList.Document.ContentStart, RtbClassList.Document.ContentEnd);
+        
         if (textRange.Text is not (null or ""))
             listClass.AddRange(
                 from lboxInfoItem in textRange.Text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)

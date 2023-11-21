@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Hisu")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("A application for regist course huflit")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+af9c83b983116c628c9f48645b6849bb23da7122")]
 [assembly: System.Reflection.AssemblyProductAttribute("ClassRegisterApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ClassRegisterApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0")]

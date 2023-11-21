@@ -10,7 +10,7 @@ internal class CodeService
 {
     private HttpClient HttpClient { get; } = new();
 
-    internal async Task<Code?> CheckCode(string code)
+    internal async Task<Code?> CheckCodeAsync(string code)
     {
         var response =
             await HttpClient.GetAsync($"https://data.mongodb-api.com/app/data-mwqpn/endpoint/code?code={code}");

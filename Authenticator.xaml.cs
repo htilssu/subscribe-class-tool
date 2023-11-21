@@ -24,7 +24,7 @@ internal partial class Authenticator
 
     private async void LogButton_OnClick(object sender, RoutedEventArgs e)
     {
-        var code = await _codeService.CheckCode(CodeTextBox.Text);
+        var code = await _codeService.CheckCodeAsync(CodeTextBox.Text);
 
         if (code == null)
         {
