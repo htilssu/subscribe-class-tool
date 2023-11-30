@@ -103,11 +103,46 @@ internal class HuflitPortal
 
         async Task Body(string classId)
         {
+            // if (_classHideId.ContainsKey(classId) || _classHideId.ContainsKey(classId.Split('-')[0]))
+            // {
+            //     var registerHide = "";
+            //     if (classId.Contains('-'))
+            //     {
+            //         var split = classId.Split('-');
+            //         var LT = split[0];
+            //         var TH = split[1];
+            //         _classHideId.TryGetValue(LT, out var LTHideId);
+            //         var isHasChildHide = _classChild.TryGetValue(LT, out var dicChildHide);
+            //         if (isHasChildHide)
+            //         {
+            //             dicChildHide!.TryGetValue(TH, out var THHideId);
+            //             registerHide = LTHideId + "|" + THHideId + "|";
+            //         }
+            //     }
+            //     else
+            //     {
+            //         _classHideId.TryGetValue(classId, out var value);
+            //         registerHide = value;
+            //     }
+            //
+            //     var responseRegistry = await _client.GetAsync(
+            //         $"https://dkmh.huflit.edu.vn/DangKyHocPhan/RegistUpdateScheduleStudyUnit?Hide={registerHide}&ScheduleStudyUnitOld=&acceptConflict=");
+            //
+            //     var status = await responseRegistry.Content.ReadFromJsonAsync<PortalResponseStatus>();
+            //     listBox.Items.Add(status?.Msg + $" {classId}");
+            //     return;
+            // }
+
+
+            var newClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromMinutes(10)
+            };
+            newClient.DefaultRequestHeaders.Add("Cookie", _cookie);
             var hideId = new Dictionary<string, string>();
             var childHide = new Dictionary<string, Dictionary<string, string>>();
-            _client.Timeout = TimeSpan.FromMinutes(20);
             var response =
-                await _client.GetAsync(
+                await newClient.GetAsync(
                     $"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachLopHocPhan?id={classId}&registType=KH");
 
             var content = await response.Content.ReadAsStringAsync();
@@ -147,6 +182,8 @@ internal class HuflitPortal
                     }
 
                     if (secret.Contains("tr-of-") || classCode == "") continue;
+                    _classHideId.TryAdd(classCode, secret);
+                    _classChild.TryAdd(classCode, childHideIdDictionary);
                     hideId.TryAdd(classCode, secret);
                     childHide.TryAdd(classCode, childHideIdDictionary);
                 }
