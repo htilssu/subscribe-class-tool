@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using ClassRegisterApp.Pages;
+using ClassRegisterApp.Services;
 
 namespace ClassRegisterApp;
 
@@ -9,7 +11,6 @@ namespace ClassRegisterApp;
 internal partial class Authenticator
 {
     private readonly CodeService _codeService;
-    private User? _user;
 
     public Authenticator()
     {
@@ -22,7 +23,7 @@ internal partial class Authenticator
     }
 
 
-    private async void LogButton_OnClick(object sender, RoutedEventArgs e)
+    private async void LoginBtn_OnClick(object sender, RoutedEventArgs e)
     {
         var code = await _codeService.CheckCodeAsync(CodeTextBox.Text);
 
@@ -32,14 +33,18 @@ internal partial class Authenticator
             return;
         }
 
-        _user = new User(UserNameTextBox.Text, PasswordTextBox.Password);
-        var main = new Main(_user, code);
+        var main = new Main(code);
         main.Show();
         Close();
     }
 
     private void OnEnterLogin(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter) LogButton_OnClick(sender, e);
+        if (e.Key == Key.Enter) LoginBtn_OnClick(sender, e);
+    }
+
+    private void SwitchLoginBtn_OnClick(object sender, RoutedEventArgs e)
+    {
+        AccountPanel.Visibility = AccountPanel.IsVisible ? Visibility.Collapsed : Visibility.Visible;
     }
 }

@@ -2,11 +2,11 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ClassRegisterApp;
+namespace ClassRegisterApp.Models;
 
-internal class Code
+internal abstract class Code
 {
-    public int DayExpired { get; set; } = 1;
+    public int DayExpired { get; set; } = 0;
 
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]

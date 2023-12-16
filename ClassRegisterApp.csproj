@@ -7,24 +7,21 @@
         <PackageIcon>huflit-logo.png</PackageIcon>
         <LangVersion>12</LangVersion>
         <ApplicationIcon>Images\huflit-logo.ico</ApplicationIcon>
-        <TargetFramework>net7.0-windows</TargetFramework>
         <Title>A application for regist course huflit</Title>
         <Authors>Hisu</Authors>
         <Description>A application for regist course huflit</Description>
         <Copyright>Hisu</Copyright>
         <PackageReleaseNotes>A application for regist course huflit</PackageReleaseNotes>
         <Company>Hisu</Company>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
+        <AssemblyVersion>1.0.1</AssemblyVersion>
+        <FileVersion>1.0.1</FileVersion>
+        <TargetFrameworks>net7.0-windows;net8.0-windows</TargetFrameworks>
+        <PublicSign>false</PublicSign>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <DocumentationFile>bin\Release\ClassRegisterApp.xml</DocumentationFile>
     </PropertyGroup>
-
-    <ItemGroup>
-        <Folder Include="Models\"/>
-    </ItemGroup>
 
 
     <ItemGroup>
@@ -45,6 +42,20 @@
         </EmbeddedResource>
         <None Remove="huflit-logo.png"/>
         <EmbeddedResource Include="huflit-logo.png"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <Page Update="Page\Authenticator.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Page\Main.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
     </ItemGroup>
 
 </Project>
