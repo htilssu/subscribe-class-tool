@@ -4,9 +4,15 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ClassRegisterApp.Models;
 
-internal abstract class Code
+internal class Code
 {
-    public int DayExpired { get; set; } = 0;
+    public Code()
+    {
+
+    }
+
+
+    public int DayExpired { get; set; }
 
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]

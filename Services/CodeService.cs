@@ -22,3 +22,11 @@ internal class CodeService
         return codeResponse?.FirstOrDefault(c => c.Time.AddDays(c.DayExpired) >= currentTime);
     }
 }
+
+internal static class ApiKeyService
+{
+    public static HttpClient GetConnection()
+    {
+        return new HttpClient();
+    }
+}

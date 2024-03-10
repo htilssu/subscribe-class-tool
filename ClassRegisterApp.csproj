@@ -15,8 +15,8 @@
         <Company>Hisu</Company>
         <AssemblyVersion>1.0.1</AssemblyVersion>
         <FileVersion>1.0.1</FileVersion>
-        <TargetFrameworks>net7.0-windows;net8.0-windows</TargetFrameworks>
         <PublicSign>false</PublicSign>
+        <TargetFramework>net8.0-windows</TargetFramework>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -25,9 +25,8 @@
 
 
     <ItemGroup>
-        <PackageReference Include="HtmlAgilityPack" Version="1.11.54"/>
-        <PackageReference Include="MongoDB.Bson" Version="2.22.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.59"/>
+        <PackageReference Include="MongoDB.Bson" Version="2.24.0"/>
     </ItemGroup>
 
 

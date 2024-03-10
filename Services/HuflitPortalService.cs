@@ -35,6 +35,8 @@ internal class HuflitPortal
 
     private string _cookie = "";
 
+    private ListBox listBoxx;
+
 
     public int Delay { get; init; }
 
@@ -54,6 +56,7 @@ internal class HuflitPortal
     /// <param name="listBox"></param>
     public async void RunOptimized(List<string>? classListCode, ListBox listBox)
     {
+        listBoxx = listBox;
         var subjectIdList = await GetSubjectIdList();
         if (classListCode == null || subjectIdList == null) return;
         RegistrySubject(subjectIdList, classListCode, listBox);
@@ -80,7 +83,7 @@ internal class HuflitPortal
             var response =
                 await newClient.GetAsync(
                     $"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachLopHocPhan?id={classId}&registType=KH");
-
+            listBox.Items.Add($"Đang lấy thông tin {classId}");
             var content = await response.Content.ReadAsStringAsync();
             var contentDocument = new HtmlDocument();
             contentDocument.LoadHtml(content);
@@ -147,6 +150,7 @@ internal class HuflitPortal
                         registerHide = value;
                     }
 
+                    listBox.Items.Add($"Đang đăng ký {code}");
                     var responseRegistry = await _client.GetAsync(
                         $"https://dkmh.huflit.edu.vn/DangKyHocPhan/RegistUpdateScheduleStudyUnit?Hide={registerHide}&ScheduleStudyUnitOld=&acceptConflict=");
 
@@ -176,6 +180,7 @@ internal class HuflitPortal
     /// <returns>A list contain Subject ID to get SecretCode</returns>
     private async Task<List<string>?> GetSubjectIdList()
     {
+        listBoxx.Items.Add("Đang lấy danh sách học phần");
         var response =
             await _client.GetAsync(@"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachHocPhan?typeId=KH&id=");
         var document = new HtmlDocument();
