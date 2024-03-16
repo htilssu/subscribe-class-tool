@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Controls;
 using ClassRegisterApp.Models;
+using ClassRegisterApp.Pages;
 using HtmlAgilityPack;
 
 namespace ClassRegisterApp.Services;
@@ -35,7 +36,9 @@ internal class HuflitPortal
 
     private string _cookie = "";
 
-    private ListBox listBoxx;
+    private ListBox? _listBoxx;
+
+    public Main.SubscribeType SubscribeType { get; set; }
 
 
     public int Delay { get; init; }
@@ -56,7 +59,7 @@ internal class HuflitPortal
     /// <param name="listBox"></param>
     public async void RunOptimized(List<string>? classListCode, ListBox listBox)
     {
-        listBoxx = listBox;
+        _listBoxx = listBox;
         var subjectIdList = await GetSubjectIdList();
         if (classListCode == null || subjectIdList == null) return;
         RegistrySubject(subjectIdList, classListCode, listBox);
@@ -80,9 +83,10 @@ internal class HuflitPortal
             newClient.DefaultRequestHeaders.Add("Cookie", _cookie);
             var hideId = new Dictionary<string, string>();
             var childHide = new Dictionary<string, Dictionary<string, string>>();
+            var subscribeType = SubscribeType == Main.SubscribeType.KH ? "KH" : "NKH";
             var response =
                 await newClient.GetAsync(
-                    $"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachLopHocPhan?id={classId}&registType=KH");
+                    $"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachLopHocPhan?id={classId}&registType={subscribeType}");
             listBox.Items.Add($"Đang lấy thông tin {classId}");
             var content = await response.Content.ReadAsStringAsync();
             var contentDocument = new HtmlDocument();
@@ -180,9 +184,11 @@ internal class HuflitPortal
     /// <returns>A list contain Subject ID to get SecretCode</returns>
     private async Task<List<string>?> GetSubjectIdList()
     {
-        listBoxx.Items.Add("Đang lấy danh sách học phần");
+        _listBoxx?.Items.Add("Đang lấy danh sách học phần");
+        var subscribeType = SubscribeType == Main.SubscribeType.KH ? "KH" : "NKH";
         var response =
-            await _client.GetAsync(@"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachHocPhan?typeId=KH&id=");
+            await _client.GetAsync(
+                $@"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachHocPhan?typeId={subscribeType}&id=");
         var document = new HtmlDocument();
         var subjectIdList = new List<string>();
         var content = await response.Content.ReadAsStringAsync();

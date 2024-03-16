@@ -39,6 +39,10 @@
                     Check Login
                 </Button>
             </StackPanel>
+            <StackPanel FlowDirection="LeftToRight">
+                <RadioButton Name="KH" Content="KH" Checked="KH_OnChecked" />
+                <RadioButton Name="NKH" Content="NKH" Checked="NKH_OnChecked" />
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>
