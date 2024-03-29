@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -34,6 +33,7 @@ internal class HuflitPortal
         Timeout = TimeSpan.FromMinutes(30)
     };
 
+
     private string _cookie = "";
 
     private ListBox? _listBoxx;
@@ -44,9 +44,14 @@ internal class HuflitPortal
     public int Delay { get; init; }
 
 
-    public void SetCookie(string cookie)
+    public void SetCookie(string cookie, bool loginType)
     {
-        _cookie = "ASP.NET_SessionId=" + cookie;
+        if (loginType)
+            _cookie = "ASP.NET_SessionId=" + cookie;
+        else
+            _cookie = cookie;
+
+        _cookie = _cookie.Trim();
         _client.DefaultRequestHeaders.Remove("Cookie");
         _client.DefaultRequestHeaders.Add("Cookie", _cookie);
     }
@@ -75,12 +80,7 @@ internal class HuflitPortal
 
         async Task Register(string classId)
         {
-            var newClient = new HttpClient
-            {
-                Timeout = TimeSpan.FromMinutes(30)
-            };
-            if (string.IsNullOrEmpty(_cookie)) throw new Exception("cookie is required");
-            newClient.DefaultRequestHeaders.Add("Cookie", _cookie);
+            var newClient = GetHttpRequest(_cookie);
             var hideId = new Dictionary<string, string>();
             var childHide = new Dictionary<string, Dictionary<string, string>>();
             var subscribeType = SubscribeType == Main.SubscribeType.KH ? "KH" : "NKH";
@@ -138,14 +138,14 @@ internal class HuflitPortal
                     if (code.Contains('-'))
                     {
                         var split = code.Split('-');
-                        var LT = split[0];
-                        var TH = split[1];
-                        hideId.TryGetValue(LT, out var LTHideId);
-                        var isHasChildHide = childHide.TryGetValue(LT, out var dicChildHide);
+                        var lt = split[0];
+                        var th = split[1];
+                        hideId.TryGetValue(lt, out var ltHideId);
+                        var isHasChildHide = childHide.TryGetValue(lt, out var dicChildHide);
                         if (isHasChildHide)
                         {
-                            dicChildHide!.TryGetValue(TH, out var THHideId);
-                            registerHide = LTHideId + "|" + THHideId + "|";
+                            dicChildHide!.TryGetValue(th, out var thHideId);
+                            registerHide = ltHideId + "|" + thHideId + "|";
                         }
                     }
                     else
@@ -172,9 +172,20 @@ internal class HuflitPortal
     ///         Must call after
     ///     </remarks>
     /// </summary>
-    public async Task ConnectToDkmh()
+    public async Task RegisterCookieToServer()
     {
         await _client.GetAsync(Url + "/Home/DangKyHocPhan");
+    }
+
+    public async Task ConnectToDKMH()
+    {
+        var res = await _client.GetAsync("https://dkmh.huflit.edu.vn/DangKyHocPhan");
+        res.Content.Headers.TryGetValues("Set-Cookie", out var cookie);
+        if (cookie == null) return;
+        var newCookie = cookie.Aggregate("", (current, value) => current + value);
+        if (!_cookie.EndsWith(';')) _cookie += ";";
+        _cookie += newCookie;
+        SetCookie(_cookie, false);
     }
 
 
@@ -207,29 +218,6 @@ internal class HuflitPortal
         return subjectIdList;
     }
 
-    private List<string>? GetClassCodeListFromFile(string path)
-    {
-        var classCodeList = new List<string>();
-
-        var classList = File.ReadAllText(path);
-
-        if (string.IsNullOrEmpty(classList))
-        {
-            Console.WriteLine("Bạn chưa nhập lớp học phần");
-            Console.WriteLine("Đang kết thúc chương trình...");
-            return null;
-        }
-
-
-        var classListSpread = classList.Split('\n');
-        foreach (var classCode in classListSpread)
-        {
-            var classCodeNoReplace = classCode.Replace("\r", "");
-            classCodeList.Add(classCodeNoReplace);
-        }
-
-        return classCodeList;
-    }
 
     private string GetSubjectId(string href)
     {
@@ -269,5 +257,13 @@ internal class HuflitPortal
 
         var user = new User(info[0].InnerText);
         return user;
+    }
+
+    private HttpClient GetHttpRequest(string cookie)
+    {
+        var newRequest = new HttpClient();
+        newRequest.DefaultRequestHeaders.Add("Cookie", cookie);
+        newRequest.Timeout = TimeSpan.FromMinutes(10);
+        return newRequest;
     }
 }

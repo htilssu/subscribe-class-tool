@@ -18,7 +18,14 @@ internal partial class Main : Window
     }
 
     private readonly HuflitPortal _huflitPortal = new();
+
     private bool _isLogged;
+
+    /// <summary>
+    ///     If true, login with portal cookie, else login with student id and password
+    /// </summary>
+    private bool _loginType = true;
+
     private SubscribeType _subscribeType = SubscribeType.KH;
 
     public Main(Code code)
@@ -48,11 +55,11 @@ internal partial class Main : Window
             return;
         }
 
-        if (!_isLogged)
-        {
-            ListBoxState.Items.Add("Chưa đăng nhập fen ưi");
-            return;
-        }
+        // if (!_isLogged)
+        // {
+        //     ListBoxState.Items.Add("Chưa đăng nhập fen ưi");
+        //     return;
+        // }
 
 
         var textRange = new TextRange(RtbClassList.Document.ContentStart, RtbClassList.Document.ContentEnd);
@@ -62,7 +69,7 @@ internal partial class Main : Window
                 from lboxInfoItem in textRange.Text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
                 where lboxInfoItem is not null
                 select lboxInfoItem);
-        await _huflitPortal.ConnectToDkmh();
+        await _huflitPortal.RegisterCookieToServer();
         try
         {
             _huflitPortal.RunOptimized(listClass, ListBoxState);
@@ -76,15 +83,23 @@ internal partial class Main : Window
 
     private async void BtnCheckLogin_OnClick(object sender, RoutedEventArgs e)
     {
-        _huflitPortal.SetCookie(TbCookie.Text.Replace(Environment.NewLine, ""));
-        var res = await _huflitPortal.CheckCookie();
-        ListBoxState.Items.Add(res != null ? "Cookie hợp lệ" : "Cookie không hợp lệ");
-        if (res != null)
+        _huflitPortal.SetCookie(TbCookie.Text.Replace(Environment.NewLine, ""), _loginType);
+        if (_loginType)
         {
-            ListBoxState.Items.Add(res.UserName);
-            _isLogged = true;
+            var res = await _huflitPortal.CheckCookie();
+            ListBoxState.Items.Add(res != null ? "Cookie hợp lệ" : "Cookie không hợp lệ");
+            if (res != null)
+            {
+                ListBoxState.Items.Add(res.UserName);
+                _isLogged = true;
+            }
+        }
+        else
+        {
+            await _huflitPortal.ConnectToDKMH();
         }
     }
+
 
     private void KH_OnChecked(object sender, RoutedEventArgs e)
     {
@@ -100,5 +115,15 @@ internal partial class Main : Window
     {
         var textRange = new TextRange(rtb.Document.ContentStart, rtb.Document.ContentEnd);
         return string.IsNullOrWhiteSpace(textRange.Text);
+    }
+
+    private void PortalCookie_OnChecked(object sender, RoutedEventArgs e)
+    {
+        _loginType = true;
+    }
+
+    private void PW_OnChecked(object sender, RoutedEventArgs e)
+    {
+        _loginType = false;
     }
 }
