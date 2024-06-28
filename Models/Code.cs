@@ -6,12 +6,6 @@ namespace ClassRegisterApp.Models;
 
 internal class Code
 {
-    public Code()
-    {
-
-    }
-
-
     public int DayExpired { get; set; }
 
     [BsonId]

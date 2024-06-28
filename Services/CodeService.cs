@@ -9,12 +9,9 @@ namespace ClassRegisterApp.Services;
 
 internal class CodeService
 {
-    private HttpClient HttpClient { get; } = ApiKeyService.GetConnection();
-
     internal async Task<Code?> CheckCodeAsync(string code)
     {
-        var response =
-            await HttpClient.GetAsync($"https://data.mongodb-api.com/app/data-mwqpn/endpoint/code?code={code}");
+        var response = await DataService.SendRequest(HttpMethod.Get, $"/api/v1/code?code={code}", null);
         if (!response.IsSuccessStatusCode) return null;
         var codeResponse = await response.Content.ReadFromJsonAsync<Code[]>();
         if (codeResponse is { Length: 0 }) return null;
@@ -23,10 +20,3 @@ internal class CodeService
     }
 }
 
-internal static class ApiKeyService
-{
-    public static HttpClient GetConnection()
-    {
-        return new HttpClient();
-    }
-}

@@ -4,7 +4,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
-        Title="Đăng ký môn HUFLIT" Height="450" Width="800" x:ClassModifier="internal">
+        WindowStartupLocation="CenterScreen" 
+        ResizeMode="NoResize"
+        Title="Đăng ký môn HUFLIT" Height="500" Width="800" x:ClassModifier="internal">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -43,6 +45,10 @@
                 <Button Click="BtnCheckLogin_OnClick" Height="30" Width="80" Margin="0 20"
                         Background="DimGray" Foreground="White">
                     Check Login
+                </Button>
+                <Button Click="ResetButton_OnClick" Height="30" Width="80" Background="DimGray" Foreground="White"
+                        Name="ResetButton">
+                    Reset Login
                 </Button>
             </StackPanel>
             <StackPanel FlowDirection="LeftToRight">

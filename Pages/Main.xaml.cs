@@ -13,7 +13,13 @@ internal partial class Main : Window
 {
     public enum SubscribeType
     {
+        /// <summary>
+        /// Trong kế hoạch
+        /// </summary>
         KH,
+        /// <summary>
+        /// Ngoài kế hoạch
+        /// </summary>
         NKH
     }
 
@@ -69,9 +75,18 @@ internal partial class Main : Window
                 from lboxInfoItem in textRange.Text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
                 where lboxInfoItem is not null
                 select lboxInfoItem);
-        await _huflitPortal.RegisterCookieToServer();
+
         try
         {
+            if (!_loginType)
+            {
+                await _huflitPortal.ConnectToDkmh();
+            }
+            else
+            {
+                await _huflitPortal.RegisterCookieToServer();
+            }
+
             _huflitPortal.RunOptimized(listClass, ListBoxState);
         }
         catch (Exception)
@@ -83,7 +98,7 @@ internal partial class Main : Window
 
     private async void BtnCheckLogin_OnClick(object sender, RoutedEventArgs e)
     {
-        _huflitPortal.SetCookie(TbCookie.Text.Replace(Environment.NewLine, ""), _loginType);
+        _huflitPortal.SetCookie("ASP.NET_SessionId=" + TbCookie.Text.Replace(Environment.NewLine, ""));
         if (_loginType)
         {
             var res = await _huflitPortal.CheckCookie();
@@ -93,10 +108,6 @@ internal partial class Main : Window
                 ListBoxState.Items.Add(res.UserName);
                 _isLogged = true;
             }
-        }
-        else
-        {
-            await _huflitPortal.ConnectToDKMH();
         }
     }
 
@@ -125,5 +136,11 @@ internal partial class Main : Window
     private void PW_OnChecked(object sender, RoutedEventArgs e)
     {
         _loginType = false;
+    }
+
+    private void ResetButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        _huflitPortal.IsRegisterCookie = false;
+        _huflitPortal.SetCookie("");
     }
 }

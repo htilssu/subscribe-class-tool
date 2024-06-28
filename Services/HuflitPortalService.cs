@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using System.Web;
 using System.Windows.Controls;
 using ClassRegisterApp.Models;
 using ClassRegisterApp.Pages;
@@ -33,32 +32,36 @@ internal class HuflitPortal
         Timeout = TimeSpan.FromMinutes(30)
     };
 
+    bool _isRegisterCookie;
+
+    public bool IsRegisterCookie
+    {
+        get => _isRegisterCookie;
+        set => _isRegisterCookie = value;
+    }
+
 
     private string _cookie = "";
 
     private ListBox? _listBoxx;
 
-    public Main.SubscribeType SubscribeType { get; set; }
+    public Main.SubscribeType SubscribeType { get; init; }
 
 
     public int Delay { get; init; }
 
 
-    public void SetCookie(string cookie, bool loginType)
+    public void SetCookie(string cookie)
     {
-        if (loginType)
-            _cookie = "ASP.NET_SessionId=" + cookie;
-        else
-            _cookie = cookie;
-
-        _cookie = _cookie.Trim();
+        _cookie = cookie.Trim();
+        if (!_cookie.EndsWith(';')) _cookie += ";";
         _client.DefaultRequestHeaders.Remove("Cookie");
         _client.DefaultRequestHeaders.Add("Cookie", _cookie);
     }
 
 
     /// <summary>
-    ///     Single registry (when a request get successfully hideId)
+    /// <para>Chạy đăng ký tất cả các môn cùng lúc</para>
     /// </summary>
     /// <param name="classListCode"></param>
     /// <param name="listBox"></param>
@@ -174,18 +177,26 @@ internal class HuflitPortal
     /// </summary>
     public async Task RegisterCookieToServer()
     {
-        await _client.GetAsync(Url + "/Home/DangKyHocPhan");
+        if (!_isRegisterCookie)
+        {
+            await _client.GetAsync(Url + "/Home/DangKyHocPhan");
+            _isRegisterCookie = true;
+        }
+
     }
 
-    public async Task ConnectToDKMH()
+    public async Task ConnectToDkmh()
     {
-        var res = await _client.GetAsync("https://dkmh.huflit.edu.vn/DangKyHocPhan");
-        res.Content.Headers.TryGetValues("Set-Cookie", out var cookie);
-        if (cookie == null) return;
-        var newCookie = cookie.Aggregate("", (current, value) => current + value);
-        if (!_cookie.EndsWith(';')) _cookie += ";";
-        _cookie += newCookie;
-        SetCookie(_cookie, false);
+        if (!_isRegisterCookie)
+        {
+            var res = await _client.GetAsync("https://dkmh.huflit.edu.vn/DangKyHocPhan");
+            res.Content.Headers.TryGetValues("Set-Cookie", out var cookie);
+            if (cookie == null) return;
+            var newCookie = cookie.Aggregate("", (current, value) => current + value);
+            if (!_cookie.EndsWith(';')) _cookie += ";";
+            _cookie += newCookie;
+            _isRegisterCookie = true;
+        }
     }
 
 
@@ -228,14 +239,6 @@ internal class HuflitPortal
         return subjectId;
     }
 
-    private string GetSubjectName(string href)
-    {
-        var subString = href[(href.IndexOf(',') + 2)..];
-        subString = subString[..subString.IndexOf('\'')];
-        var decoded = HttpUtility.HtmlDecode(subString);
-        return decoded;
-    }
-
     private string GetFirstStringInJavaScripts(string href)
     {
         var startIndex = href.IndexOf('\'') + 1;
@@ -247,6 +250,7 @@ internal class HuflitPortal
 
     public async Task<User?> CheckCookie()
     {
+        _isRegisterCookie = false;
         var res = await _client.GetAsync(Url);
         if (!res.IsSuccessStatusCode) return null;
         var responseContent = await res.Content.ReadAsStringAsync();

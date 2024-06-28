@@ -1,9 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Input;
-using ClassRegisterApp.Pages;
 using ClassRegisterApp.Services;
 
-namespace ClassRegisterApp;
+namespace ClassRegisterApp.Pages;
 
 /// <summary>
 ///     Interaction logic for MainWindow.xaml
