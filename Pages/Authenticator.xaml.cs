@@ -10,6 +10,7 @@ namespace ClassRegisterApp.Pages;
 internal partial class Authenticator
 {
     private readonly CodeService _codeService;
+    bool _isLogging = false;
 
     public Authenticator()
     {
@@ -24,8 +25,10 @@ internal partial class Authenticator
 
     private async void LoginBtn_OnClick(object sender, RoutedEventArgs e)
     {
+        if (_isLogging) return; // Prevent multiple login
+        _isLogging = true;
         var code = await _codeService.CheckCodeAsync(CodeTextBox.Text);
-
+        _isLogging = false;
         if (code == null)
         {
             MessageBox.Show("Code sai!!", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
