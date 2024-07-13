@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ClassRegisterApp.Models;
 
-internal class Code
+public class Code
 {
     public int DayExpired { get; set; }
 

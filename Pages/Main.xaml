@@ -34,26 +34,39 @@
             </Button>
 
             <StackPanel Margin="0 20">
-                <TextBox Name="TbCookie" Height="30" VerticalContentAlignment="Center" FontSize="16"
+                <Grid>
+                     <TextBox Name="TbCookie"  Height="30" VerticalContentAlignment="Center" FontSize="16"
                          VerticalAlignment="Center" />
+                    <TextBlock IsHitTestVisible="False" Text="Nhập cookie" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="DarkGray">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=TbCookie}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
                 <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal"
                             HorizontalAlignment="Center" Margin="10">
-                    <RadioButton Name="PortalCookie" Margin="0 0 10 0" Content="Cookie"
+                    <RadioButton IsChecked="True" Margin="0 0 10 0" Content="Cookie"
                                  Checked="PortalCookie_OnChecked" />
-                    <RadioButton Name="PW" Content="PW" Checked="PW_OnChecked" />
+                    <RadioButton Content="PW" Checked="PW_OnChecked" />
                 </StackPanel>
-                <Button Click="BtnCheckLogin_OnClick" Height="30" Width="80" Margin="0 20"
+                <Button Name="CheckLoginBtn" Click="BtnCheckLogin_OnClick" Height="30" Width="80" Margin="0 20"
                         Background="DimGray" Foreground="White">
                     Check Login
                 </Button>
-                <Button Click="ResetButton_OnClick" Height="30" Width="80" Background="DimGray" Foreground="White"
-                        Name="ResetButton">
+                <Button Click="ResetButton_OnClick" Height="30" Width="80" Background="DimGray" Foreground="White">
                     Reset Login
                 </Button>
             </StackPanel>
             <StackPanel FlowDirection="LeftToRight">
-                <RadioButton Name="KH" Content="KH" Checked="KH_OnChecked" />
-                <RadioButton Name="NKH" Content="NKH" Checked="NKH_OnChecked" />
+                <RadioButton IsChecked="True"  Name="KH" Content="Kế hoạch" Checked="KH_OnChecked" />
+                <RadioButton Name="NKH" Content="Ngoài kế hoạch" Checked="NKH_OnChecked" />
             </StackPanel>
         </StackPanel>
     </Grid>

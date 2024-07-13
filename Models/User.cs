@@ -5,7 +5,7 @@ namespace ClassRegisterApp.Models;
 /// <summary>
 ///     A user object contain username and password
 /// </summary>
-internal class User
+public class User
 {
     private string _userName;
 

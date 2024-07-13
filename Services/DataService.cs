@@ -14,7 +14,7 @@ public class DataService
         var request = new HttpRequestMessage(method, Url + url);
         if (method == HttpMethod.Post && body != null)
         {
-            request.Content = new StringContent(body);
+            request.Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
         }
 
         return await _httpClient.SendAsync(request);

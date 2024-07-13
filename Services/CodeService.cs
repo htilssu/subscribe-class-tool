@@ -13,10 +13,17 @@ internal class CodeService
     {
         var response = await DataService.SendRequest(HttpMethod.Get, $"/api/v1/code?code={code}", null);
         if (!response.IsSuccessStatusCode) return null;
-        var codeResponse = await response.Content.ReadFromJsonAsync<Code[]>();
-        if (codeResponse is { Length: 0 }) return null;
-        var currentTime = DateTime.Now;
-        return codeResponse?.FirstOrDefault(c => c.Time.AddDays(c.DayExpired) >= currentTime);
+        try
+        {
+            var codeResponse = await response.Content.ReadFromJsonAsync<Code[]>();
+            if (codeResponse is { Length: 0 }) return null;
+            var currentTime = DateTime.Now;
+            return codeResponse?.FirstOrDefault(c => c.Time.AddDays(c.DayExpired) >= currentTime);
+        } catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        return null;
     }
 }
-

@@ -9,7 +9,7 @@ using ClassRegisterApp.Services;
 
 namespace ClassRegisterApp.Pages;
 
-internal partial class Main : Window
+internal partial class Main
 {
     public enum SubscribeType
     {
@@ -23,9 +23,9 @@ internal partial class Main : Window
         NKH
     }
 
-    private readonly HuflitPortal _huflitPortal = new();
+    private readonly HuflitPortal _huflitPortal;
 
-    private bool _isLogged;
+    private bool _isLoggedDkMh;
 
     /// <summary>
     ///     If true, login with portal cookie, else login with student id and password
@@ -49,6 +49,7 @@ internal partial class Main : Window
 
     public Main()
     {
+        _huflitPortal = new();
     }
 
 
@@ -61,13 +62,6 @@ internal partial class Main : Window
             return;
         }
 
-        // if (!_isLogged)
-        // {
-        //     ListBoxState.Items.Add("Chưa đăng nhập fen ưi");
-        //     return;
-        // }
-
-
         var textRange = new TextRange(RtbClassList.Document.ContentStart, RtbClassList.Document.ContentEnd);
 
         if (textRange.Text is not (null or ""))
@@ -78,14 +72,18 @@ internal partial class Main : Window
 
         try
         {
-            if (!_loginType)
+            if (!_isLoggedDkMh)
             {
-                await _huflitPortal.ConnectToDkmh();
+                if (!_loginType)
+                {
+                    await _huflitPortal.ConnectToDkmh();
+                }
+                else
+                {
+                    await _huflitPortal.RegisterCookieToServer();
+                }
             }
-            else
-            {
-                await _huflitPortal.RegisterCookieToServer();
-            }
+            
 
             _huflitPortal.RunOptimized(listClass, ListBoxState);
         }
@@ -103,11 +101,9 @@ internal partial class Main : Window
         {
             var res = await _huflitPortal.CheckCookie();
             ListBoxState.Items.Add(res != null ? "Cookie hợp lệ" : "Cookie không hợp lệ");
-            if (res != null)
-            {
-                ListBoxState.Items.Add(res.UserName);
-                _isLogged = true;
-            }
+            if (res == null) return;
+            ListBoxState.Items.Add(res.UserName);
+            _isLoggedDkMh = true;
         }
     }
 
@@ -122,7 +118,7 @@ internal partial class Main : Window
         _subscribeType = SubscribeType.NKH;
     }
 
-    private bool IsRichTextBoxEmpty(RichTextBox rtb)
+    private static bool IsRichTextBoxEmpty(RichTextBox rtb)
     {
         var textRange = new TextRange(rtb.Document.ContentStart, rtb.Document.ContentEnd);
         return string.IsNullOrWhiteSpace(textRange.Text);
@@ -131,16 +127,21 @@ internal partial class Main : Window
     private void PortalCookie_OnChecked(object sender, RoutedEventArgs e)
     {
         _loginType = true;
+        if (CheckLoginBtn != null)
+        {
+            CheckLoginBtn.Visibility = Visibility.Visible;
+        }
     }
 
     private void PW_OnChecked(object sender, RoutedEventArgs e)
     {
         _loginType = false;
+        CheckLoginBtn.Visibility = Visibility.Hidden;
     }
 
     private void ResetButton_OnClick(object sender, RoutedEventArgs e)
     {
+        _isLoggedDkMh = false;
         _huflitPortal.IsRegisterCookie = false;
-        _huflitPortal.SetCookie("");
     }
 }
