@@ -1,5 +1,5 @@
 ﻿using System.Net.Http;
-using System.Runtime.InteropServices.JavaScript;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ClassRegisterApp.Services;
@@ -14,7 +14,7 @@ public class DataService
         var request = new HttpRequestMessage(method, Url + url);
         if (method == HttpMethod.Post && body != null)
         {
-            request.Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
         }
 
         return await _httpClient.SendAsync(request);
