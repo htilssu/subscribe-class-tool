@@ -25,6 +25,7 @@
 
 
     <ItemGroup>
+        <PackageReference Include="dnlib" Version="4.4.0" />
         <PackageReference Include="HtmlAgilityPack" Version="1.11.59"/>
         <PackageReference Include="MongoDB.Bson" Version="2.24.0"/>
     </ItemGroup>

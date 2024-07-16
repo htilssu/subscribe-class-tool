@@ -27,7 +27,7 @@ public static class SecretService
 
         return null;
     }
-    
+
     public static async Task<Class[]> GetAllSecrets()
     {
         var response = await _httpClient.GetAsync(Url);
@@ -50,9 +50,7 @@ public static class SecretService
         {
             var response = await _httpClient.PostAsJsonAsync(Url, @class);
             return response.IsSuccessStatusCode;
-
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             Console.WriteLine(e);
         }

@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
-        WindowStartupLocation="CenterScreen" 
+        WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Title="Đăng ký môn HUFLIT" Height="500" Width="800" x:ClassModifier="internal">
     <Grid>
@@ -35,15 +35,16 @@
 
             <StackPanel Margin="0 20">
                 <Grid>
-                     <TextBox Name="TbCookie"  Height="30" VerticalContentAlignment="Center" FontSize="16"
-                         VerticalAlignment="Center" />
-                    <TextBlock IsHitTestVisible="False" Text="Nhập cookie" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="DarkGray">
+                    <TextBox Name="TbCookie" Height="30" VerticalContentAlignment="Center" FontSize="16"
+                             VerticalAlignment="Center" />
+                    <TextBlock IsHitTestVisible="False" Text="Nhập cookie" VerticalAlignment="Center"
+                               HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="DarkGray">
                         <TextBlock.Style>
                             <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Text, ElementName=TbCookie}" Value="">
-                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -65,7 +66,7 @@
                 </Button>
             </StackPanel>
             <StackPanel FlowDirection="LeftToRight">
-                <RadioButton IsChecked="True"  Name="KH" Content="Kế hoạch" Checked="KH_OnChecked" />
+                <RadioButton IsChecked="True" Name="KH" Content="Kế hoạch" Checked="KH_OnChecked" />
                 <RadioButton Name="NKH" Content="Ngoài kế hoạch" Checked="NKH_OnChecked" />
             </StackPanel>
         </StackPanel>

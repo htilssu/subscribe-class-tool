@@ -16,7 +16,8 @@ internal partial class Main
         /// <summary>
         /// Trong kế hoạch
         /// </summary>
-        KH,
+        KH
+        ,
         /// <summary>
         /// Ngoài kế hoạch
         /// </summary>
@@ -25,7 +26,6 @@ internal partial class Main
 
     private readonly HuflitPortal _huflitPortal;
 
-    private bool _isLoggedDkMh;
 
     /// <summary>
     ///     If true, login with portal cookie, else login with student id and password
@@ -38,8 +38,8 @@ internal partial class Main
     {
         _huflitPortal = new HuflitPortal
         {
-            Delay = code.Delay * 1000,
-            SubscribeType = _subscribeType
+            Delay = code.Delay * 1000
+            , SubscribeType = _subscribeType
         };
         InitializeComponent();
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -72,22 +72,17 @@ internal partial class Main
 
         try
         {
-            if (!_isLoggedDkMh)
+            if (!_loginType)
             {
-                if (!_loginType)
-                {
-                    await _huflitPortal.ConnectToDkmh();
-                }
-                else
-                {
-                    await _huflitPortal.RegisterCookieToServer();
-                }
+                await _huflitPortal.ConnectToDkmh();
             }
-            
+            else
+            {
+                await _huflitPortal.RegisterCookieToServer();
+            }
 
             _huflitPortal.RunOptimized(listClass, ListBoxState);
-        }
-        catch (Exception)
+        } catch (Exception)
         {
             MessageBox.Show("Có lỗi hãy thử lại", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
@@ -96,15 +91,12 @@ internal partial class Main
 
     private async void BtnCheckLogin_OnClick(object sender, RoutedEventArgs e)
     {
+        if (!_loginType) return;
         _huflitPortal.SetCookie("ASP.NET_SessionId=" + TbCookie.Text.Replace(Environment.NewLine, ""));
-        if (_loginType)
-        {
-            var res = await _huflitPortal.CheckCookie();
-            ListBoxState.Items.Add(res != null ? "Cookie hợp lệ" : "Cookie không hợp lệ");
-            if (res == null) return;
-            ListBoxState.Items.Add(res.UserName);
-            _isLoggedDkMh = true;
-        }
+        var res = await _huflitPortal.CheckCookie();
+        ListBoxState.Items.Add(res != null ? "Cookie hợp lệ" : "Cookie không hợp lệ");
+        if (res == null) return;
+        ListBoxState.Items.Add(res.UserName);
     }
 
 
@@ -141,7 +133,6 @@ internal partial class Main
 
     private void ResetButton_OnClick(object sender, RoutedEventArgs e)
     {
-        _isLoggedDkMh = false;
         _huflitPortal.IsRegisterCookie = false;
     }
 }
