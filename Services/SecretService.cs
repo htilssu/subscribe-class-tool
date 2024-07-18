@@ -7,6 +7,9 @@ using ClassRegisterApp.Models;
 
 namespace ClassRegisterApp.Services;
 
+/// <summary>
+/// 
+/// </summary>
 public static class SecretService
 {
     private const string Url = "https://chedule-huflit-class.vercel.app/api/secret";

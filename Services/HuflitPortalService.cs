@@ -62,6 +62,13 @@ public class HuflitPortal
 
     public int Delay { get; init; }
 
+    private bool _isAcceptConflict;
+    public bool IsAcceptConflict
+    {
+        get => _isAcceptConflict;
+        set => _isAcceptConflict = value;
+    }
+
 
     /// <summary>
     /// Đặt lại cookie cho HttpClient bằng cách xóa cookie cũ mà set lại cookie mới được thêm vào
@@ -181,10 +188,9 @@ public class HuflitPortal
                         var lt = split[0];
                         var th = split[1];
                         hideId.TryGetValue(lt, out var ltHideId);
-                        var isHasChildHide = childHide.TryGetValue(lt, out var dicChildHide);
-                        if (isHasChildHide)
+                        if (childHide.TryGetValue(lt, out var dicChildHide))
                         {
-                            dicChildHide!.TryGetValue(th, out var thHideId);
+                            dicChildHide.TryGetValue(th, out var thHideId);
                             registerHide = ltHideId + "|" + thHideId + "|";
                         }
                     }
@@ -200,7 +206,7 @@ public class HuflitPortal
                         var responseRegistry = await newClient.GetAsync(
                             $"https://dkmh.huflit.edu.vn/DangKyHocPhan/RegistUpdateScheduleStudyUnit?Hide={registerHide}&ScheduleStudyUnitOld=&acceptConflict=");
 
-                        var classList = SecretService.ConvertDicToClass(_classHideId, _classChild);
+                        var classList = SecretService.ConvertDicToClass(hideId, childHide);
                         if (classList != null)
                         {
                             foreach (var @class in classList) { _ = await SecretService.AddSecret(@class); }
@@ -209,6 +215,10 @@ public class HuflitPortal
                         var status = await responseRegistry.Content.ReadFromJsonAsync<PortalResponseStatus>();
 
                         listBox.Items.Add(status?.Msg + $" {code}");
+                        if (status?.Msg?.Contains("thành công") == true)
+                        {
+                            if (_isRegistered.ContainsKey(code)) { _isRegistered[code] = true; }
+                        }
                     } catch (HttpRequestException e)
                     {
                         listBox.Items.Add($"Lỗi khi đăng ký {code}");
@@ -242,21 +252,19 @@ public class HuflitPortal
             if (cookie != null)
             {
                 var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1));
-                if (cookieDic.TryGetValue("user", out var user)
+                if (cookieDic.TryGetValue("User", out var user)
                     && cookieDic.TryGetValue("UserPW", out var userPw))
                 {
-                    var response = await DataService.SendRequest(HttpMethod.Get, $"/api/v1/user?user={user}", null);
+                    var userDkmh = await UserService.GetUser(user);
                     try
                     {
-                        var userData = await response.Content.ReadAsStringAsync();
-
-                        if (string.IsNullOrEmpty(userData))
-                        {
-                            await DataService.SendRequest(HttpMethod.Post,
-                                "/api/v1/user",
-                                $"{{\"User\":\"{user}\",\"UserPW\":\"{userPw}\"}}");
-                        }
-                    } catch (Exception e) { Console.WriteLine(e); }
+                        if (userDkmh == null) { UserService.SaveUser(user, userPw); }
+                    } catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        await RegisterCookieToServer();
+                        return;
+                    }
 
                     SetCookie(registerResponse.Headers);
                     await ConnectToDkmh(); //get register cookie
@@ -384,14 +392,20 @@ public class HuflitPortal
         return _cookie;
     }
 
-    static Dictionary<string, string> ParseCookie(string cookie)
+    /// <summary>
+    /// Parse chuỗi cookie thành Dictionary
+    /// khóa là tên cookie, còn value là giá trị của cookie đó
+    /// </summary>
+    /// <param name="cookie">Chuỗi cookie cần parse</param>
+    /// <returns>Dictionary chứa thông tin cookie</returns>
+    public static Dictionary<string, string> ParseCookie(string cookie)
     {
         var dictionary = new Dictionary<string, string>();
         var pairs = cookie.Split(";", StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var pair in pairs)
         {
-            var keyValue = pair.Split(['='], 2);
+            var keyValue = pair.Split(["="], 2, StringSplitOptions.TrimEntries);
 
             if (keyValue.Length != 2) continue;
             var key = keyValue[0].Trim();
@@ -406,8 +420,7 @@ public class HuflitPortal
     //len lich cu sau 1 khoang thoi gian thi fetch secret tu secretService  ve
     private async void FetchSecret()
     {
-        var count = 30;
-        while (count-- > 0)
+        while (_isRegistered.ContainsValue(false))
         {
             var classList = await SecretService.GetAllSecrets();
             if (classList.Length == 0) return;
@@ -424,30 +437,30 @@ public class HuflitPortal
                 foreach (var se in _targetRegisterClass)
                 {
                     if (!_isRegistered.TryGetValue(se, out var status)) continue;
-                    if (!status)
-                    {
-                        var statusRegisterCookieByClassCodeFormat = await RegisterCookieByClassCodeFormat(se);
-                        _isRegistered[se] = statusRegisterCookieByClassCodeFormat;
-                    }
+                    if (status) continue;
+                    
+                    
+                    var statusRegisterCookieByClassCodeFormat = await RegisterCookieByClassCodeFormat(se);
+                    _isRegistered[se] = statusRegisterCookieByClassCodeFormat;
                 }
             }
 
 
-            await Task.Delay(3000);
+            await Task.Delay(1000);
         }
     }
 
     private async Task<bool> RegisterCookieByClassCodeFormat(string se)
     {
-        string secretCode = "";
+        var secretCode = "";
 
         var classList = se.Split("-");
         if (_classHideId.TryGetValue(classList[0], out var secret)) { secretCode += secret; }
 
-        if (classList.Length >= 2)
-        {
-            if (_classHideId.TryGetValue(classList[1], out secret)) { secretCode += "|" + secret + "|"; }
-        }
+        if (classList.Length < 2) return await RegisterBySecret(secretCode);
+
+
+        if (_classHideId.TryGetValue(classList[1], out secret)) { secretCode += "|" + secret + "|"; }
 
         return await RegisterBySecret(secretCode);
     }
@@ -463,10 +476,7 @@ public class HuflitPortal
             var status = await response.Content.ReadFromJsonAsync<PortalResponseStatus>();
 
 
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                _listBoxx?.Items.Add(status?.Msg);
-            });
+            Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add(status?.Msg); });
             return true;
         } catch (Exception e)
         {
