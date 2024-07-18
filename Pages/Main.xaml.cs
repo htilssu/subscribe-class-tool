@@ -16,8 +16,7 @@ internal partial class Main
         /// <summary>
         /// Trong kế hoạch
         /// </summary>
-        KH
-        ,
+        KH,
         /// <summary>
         /// Ngoài kế hoạch
         /// </summary>
@@ -38,8 +37,8 @@ internal partial class Main
     {
         _huflitPortal = new HuflitPortal
         {
-            Delay = code.Delay * 1000
-            , SubscribeType = _subscribeType
+            Delay = code.Delay * 1000,
+            SubscribeType = _subscribeType
         };
         InitializeComponent();
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -72,14 +71,8 @@ internal partial class Main
 
         try
         {
-            if (!_loginType)
-            {
-                await _huflitPortal.ConnectToDkmh();
-            }
-            else
-            {
-                await _huflitPortal.RegisterCookieToServer();
-            }
+            if (!_loginType) { await _huflitPortal.ConnectToDkmh(); }
+            else { await _huflitPortal.RegisterCookieToServer(); }
 
             _huflitPortal.RunOptimized(listClass, ListBoxState);
         } catch (Exception)
@@ -119,10 +112,7 @@ internal partial class Main
     private void PortalCookie_OnChecked(object sender, RoutedEventArgs e)
     {
         _loginType = true;
-        if (CheckLoginBtn != null)
-        {
-            CheckLoginBtn.Visibility = Visibility.Visible;
-        }
+        if (CheckLoginBtn != null) { CheckLoginBtn.Visibility = Visibility.Visible; }
     }
 
     private void PW_OnChecked(object sender, RoutedEventArgs e)

@@ -93,10 +93,7 @@ public static class ClassExtension
         var parent = classes.FirstOrDefault(c => c.Id == parentClass);
         var parentSecret = parent?.Secret ?? "";
         var childSecret = parent?.GetChild(childClass)?.Secret ?? "";
-        if (string.IsNullOrEmpty(parentClass) || string.IsNullOrEmpty(childClass))
-        {
-            return "";
-        }
+        if (string.IsNullOrEmpty(parentClass) || string.IsNullOrEmpty(childClass)) { return ""; }
 
         var secret = parentSecret + "|" + childSecret + "|";
         return secret;

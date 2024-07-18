@@ -10,7 +10,10 @@ namespace ClassRegisterApp.Services;
 public static class SecretService
 {
     private const string Url = "https://chedule-huflit-class.vercel.app/api/secret";
-    static HttpClient _httpClient = new();
+    static HttpClient _httpClient = new()
+    {
+        Timeout = TimeSpan.FromMinutes(10)
+    };
 
     public static async Task<Class?> GetSecret(string classId)
     {
@@ -20,26 +23,20 @@ public static class SecretService
         {
             var cClass = await response.Content.ReadFromJsonAsync<Class>();
             return cClass;
-        } catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        } catch (Exception e) { Console.WriteLine(e); }
 
         return null;
     }
 
     public static async Task<Class[]> GetAllSecrets()
     {
-        var response = await _httpClient.GetAsync(Url);
-        if (!response.IsSuccessStatusCode) return [];
         try
         {
+            var response = await _httpClient.GetAsync(Url);
+            if (!response.IsSuccessStatusCode) return [];
             var cClasses = await response.Content.ReadFromJsonAsync<Class[]>();
             return cClasses ?? [];
-        } catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        } catch (Exception e) { Console.WriteLine(e); }
 
         return [];
     }
@@ -50,16 +47,13 @@ public static class SecretService
         {
             var response = await _httpClient.PostAsJsonAsync(Url, @class);
             return response.IsSuccessStatusCode;
-        } catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        } catch (Exception e) { Console.WriteLine(e); }
 
         return false;
     }
 
-    public static Class[]? ConvertDicToClass(Dictionary<string, string> baseClass
-        , Dictionary<string, Dictionary<string, string>> childClass)
+    public static Class[]? ConvertDicToClass(Dictionary<string, string> baseClass,
+        Dictionary<string, Dictionary<string, string>> childClass)
     {
         List<Class> classes = [];
         if (baseClass.Count == 0) return null;
@@ -67,10 +61,7 @@ public static class SecretService
         {
             var @class = new Class(keyValuePair.Key, keyValuePair.Value);
             if (!childClass.TryGetValue(keyValuePair.Key, out var value)) continue;
-            foreach (var child in value)
-            {
-                @class.AddChild(new Class(child.Key, child.Value));
-            }
+            foreach (var child in value) { @class.AddChild(new Class(child.Key, child.Value)); }
 
             classes.Add(@class);
         }

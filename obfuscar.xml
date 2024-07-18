@@ -1,0 +1,12 @@
+﻿<?xml version='1.0'?>
+
+<Obfuscator>
+    <Var name="InPath" value=".\bin\Release\net8.0-windows" />
+    <Var name="OutPath" value=".\Obfuscated" />
+    <Var name="KeepPublicApi" value="false" />
+    <Var name="HidePrivateApi" value="true" />
+
+
+    <Module file="$(InPath)\ClassRegisterApp.dll" />
+
+</Obfuscator>

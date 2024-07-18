@@ -7,6 +7,7 @@ namespace ClassRegisterApp.Services;
 public class DataService
 {
     private static HttpClient _httpClient = ApiKeyService.GetConnection();
+
     private const string Url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/application-0-zthuk/endpoint";
 
     public static async Task<HttpResponseMessage> SendRequest(HttpMethod method, string url, string? body)

@@ -19,10 +19,7 @@ internal class CodeService
             if (codeResponse is { Length: 0 }) return null;
             var currentTime = DateTime.Now;
             return codeResponse?.FirstOrDefault(c => c.Time.AddDays(c.DayExpired) >= currentTime);
-        } catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        } catch (Exception e) { Console.WriteLine(e); }
 
         return null;
     }

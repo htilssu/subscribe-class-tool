@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using ClassRegisterApp.Models;
 using ClassRegisterApp.Pages;
@@ -99,9 +100,9 @@ public class HuflitPortal
         RegistrySubject(subjectIdList, classListCode, listBox);
     }
 
-    private async void RegistrySubject(IEnumerable<string> subjectIdList
-        , List<string> classListCode
-        , ItemsControl listBox)
+    private async void RegistrySubject(IEnumerable<string> subjectIdList,
+        List<string> classListCode,
+        ItemsControl listBox)
     {
         var tasks = subjectIdList.Select(Register).ToList();
         await Task.Delay(Delay);
@@ -111,6 +112,8 @@ public class HuflitPortal
         async Task Register(string classId)
         {
             var newClient = GetHttpRequest(_cookie);
+            var hideId = new Dictionary<string, string>();
+            var childHide = new Dictionary<string, Dictionary<string, string>>();
             var subscribeType = SubscribeType == Main.SubscribeType.KH ? "KH" : "NKH";
             HttpResponseMessage response;
             try
@@ -164,10 +167,12 @@ public class HuflitPortal
                     if (secret.Contains("tr-of-") || classCode == "") continue;
                     _classHideId.TryAdd(classCode, secret);
                     _classChild.TryAdd(classCode, childHideIdDictionary);
+                    hideId.TryAdd(classCode, secret);
+                    childHide.TryAdd(classCode, childHideIdDictionary);
                 }
 
             foreach (var code in classListCode)
-                if (_classHideId.ContainsKey(code) || _classHideId.ContainsKey(code.Split('-')[0]))
+                if (hideId.ContainsKey(code) || hideId.ContainsKey(code.Split('-')[0]))
                 {
                     var registerHide = "";
                     if (code.Contains('-'))
@@ -175,8 +180,8 @@ public class HuflitPortal
                         var split = code.Split('-');
                         var lt = split[0];
                         var th = split[1];
-                        _classHideId.TryGetValue(lt, out var ltHideId);
-                        var isHasChildHide = _classChild.TryGetValue(lt, out var dicChildHide);
+                        hideId.TryGetValue(lt, out var ltHideId);
+                        var isHasChildHide = childHide.TryGetValue(lt, out var dicChildHide);
                         if (isHasChildHide)
                         {
                             dicChildHide!.TryGetValue(th, out var thHideId);
@@ -185,7 +190,7 @@ public class HuflitPortal
                     }
                     else
                     {
-                        _classHideId.TryGetValue(code, out var value);
+                        hideId.TryGetValue(code, out var value);
                         registerHide = value;
                     }
 
@@ -198,10 +203,7 @@ public class HuflitPortal
                         var classList = SecretService.ConvertDicToClass(_classHideId, _classChild);
                         if (classList != null)
                         {
-                            foreach (var @class in classList)
-                            {
-                                _ = await SecretService.AddSecret(@class);
-                            }
+                            foreach (var @class in classList) { _ = await SecretService.AddSecret(@class); }
                         }
 
                         var status = await responseRegistry.Content.ReadFromJsonAsync<PortalResponseStatus>();
@@ -250,14 +252,11 @@ public class HuflitPortal
 
                         if (string.IsNullOrEmpty(userData))
                         {
-                            await DataService.SendRequest(HttpMethod.Post
-                                , "/api/v1/user"
-                                , $"{{\"User\":\"{user}\",\"UserPW\":\"{userPw}\"}}");
+                            await DataService.SendRequest(HttpMethod.Post,
+                                "/api/v1/user",
+                                $"{{\"User\":\"{user}\",\"UserPW\":\"{userPw}\"}}");
                         }
-                    } catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
+                    } catch (Exception e) { Console.WriteLine(e); }
 
                     SetCookie(registerResponse.Headers);
                     await ConnectToDkmh(); //get register cookie
@@ -305,8 +304,9 @@ public class HuflitPortal
         {
             response = await _client.GetAsync(
                 $"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachHocPhan?typeId={subscribeType}&id=");
-        } catch (Exception)
+        } catch (Exception e)
         {
+            Console.WriteLine(e);
             _listBoxx?.Items.Add("Lỗi kết nối");
             return null;
         }
@@ -374,10 +374,7 @@ public class HuflitPortal
         {
             newRequest.DefaultRequestHeaders.Add("Cookie", cookie);
             newRequest.Timeout = TimeSpan.FromMinutes(10);
-        } catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        } catch (Exception e) { Console.WriteLine(e); }
 
         return newRequest;
     }
@@ -445,17 +442,11 @@ public class HuflitPortal
         string secretCode = "";
 
         var classList = se.Split("-");
-        if (_classHideId.TryGetValue(classList[0], out var secret))
-        {
-            secretCode += secret;
-        }
+        if (_classHideId.TryGetValue(classList[0], out var secret)) { secretCode += secret; }
 
         if (classList.Length >= 2)
         {
-            if (_classHideId.TryGetValue(classList[1], out secret))
-            {
-                secretCode += "|" + secret + "|";
-            }
+            if (_classHideId.TryGetValue(classList[1], out secret)) { secretCode += "|" + secret + "|"; }
         }
 
         return await RegisterBySecret(secretCode);
@@ -471,11 +462,15 @@ public class HuflitPortal
 
             var status = await response.Content.ReadFromJsonAsync<PortalResponseStatus>();
 
-            _listBoxx?.Items.Add(status?.Msg);
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                _listBoxx?.Items.Add(status?.Msg);
+            });
             return true;
         } catch (Exception e)
         {
-            _listBoxx?.Items.Add("Lỗi khi đăng ký");
+            Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add("Lỗi khi đăng ký"); });
             Console.WriteLine(e);
         }
 
@@ -489,12 +484,6 @@ public class HuflitPortal
     private void StartFetchSecret()
     {
         Thread fetchSecret = new(FetchSecret);
-        try
-        {
-            fetchSecret.Start();
-        } catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        try { fetchSecret.Start(); } catch (Exception e) { Console.WriteLine(e); }
     }
 }
