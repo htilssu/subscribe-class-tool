@@ -99,7 +99,7 @@ public class HuflitPortal
         var subjectIdList = await GetSubjectIdList();
         if (subjectIdList == null)
         {
-            listBox.Items.Add("Chưa mở đăng ký, đừng spam nữa");
+            listBox.Items.Add("Không tìm thấy danh sách học phần, hãy Run lại");
             return;
         }
 
@@ -134,7 +134,7 @@ public class HuflitPortal
                 return;
             }
 
-            listBox.Items.Add($"Đang lấy thông tin {classId}");
+            listBox.Items.Add($"Đang lấy thông tin {classId} ...");
             var content = await response.Content.ReadAsStringAsync();
             var contentDocument = new HtmlDocument();
             contentDocument.LoadHtml(content);
@@ -200,7 +200,7 @@ public class HuflitPortal
                         registerHide = value;
                     }
 
-                    listBox.Items.Add($"Đang đăng ký {code}");
+                    listBox.Items.Add($"Đang đăng ký {code}...");
                     try
                     {
                         var responseRegistry = await newClient.GetAsync(
@@ -245,32 +245,40 @@ public class HuflitPortal
     {
         if (!_isRegisterCookie)
         {
-            var registerResponse = await _client.GetAsync(Url + "/Home/DangKyHocPhan");
-            registerResponse.Headers.TryGetValues("Set-Cookie", out var cookie);
-
-
-            if (cookie != null)
+            try
             {
-                var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1));
-                if (cookieDic.TryGetValue("User", out var user)
-                    && cookieDic.TryGetValue("UserPW", out var userPw))
+                var registerResponse = await _client.GetAsync(Url + "/Home/DangKyHocPhan");
+
+                if (registerResponse.Headers.TryGetValues("Set-Cookie", out var cookie))
                 {
-                    var userDkmh = await UserService.GetUser(user);
-                    try
+                    var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1));
+                    if (cookieDic.TryGetValue("User", out var user)
+                        && cookieDic.TryGetValue("UserPW", out var userPw))
                     {
-                        if (userDkmh == null) { UserService.SaveUser(user, userPw); }
-                    } catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        await RegisterCookieToServer();
-                        return;
+                        _listBoxx?.Items.Add("User=" + user + " UserPW=" + userPw);
+                        _listBoxx?.Items.Add(
+                            "Copy dòng trên lại nếu có lỗi hãy paste nó vào cookie chọn PW thay vì Cookie, rồi run lai!");
+                        _listBoxx?.Items.Add("Nhớ nhấn reset trước khi run");
+                        
+                        var userDkmh = await UserService.GetUser(user);
+                        try
+                        {
+                            if (userDkmh == null) { UserService.SaveUser(user, userPw); }
+                        } catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            return;
+                        }
+
+                        SetCookie(registerResponse.Headers);
+                        await ConnectToDkmh(); //get register cookie
+
+                        _isRegisterCookie = true;
                     }
-
-                    SetCookie(registerResponse.Headers);
-                    await ConnectToDkmh(); //get register cookie
-
-                    _isRegisterCookie = true;
                 }
+            } catch (Exception e)
+            {
+                Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add("Lỗi kết nối nhấn Run lại!"); });
             }
         }
     }
@@ -291,10 +299,17 @@ public class HuflitPortal
     {
         if (!_isRegisterCookie)
         {
-            var res = await _client.GetAsync("https://dkmh.huflit.edu.vn/DangKyHocPhan");
-            SetCookie(res.Headers);
-            if (!_cookie.EndsWith(';')) _cookie += ";";
-            _isRegisterCookie = true;
+            try
+            {
+                var res = await _client.GetAsync("https://dkmh.huflit.edu.vn/DangKyHocPhan");
+                SetCookie(res.Headers);
+                if (!_cookie.EndsWith(';')) _cookie += ";";
+                _isRegisterCookie = true;
+            } catch (Exception e)
+            {
+                Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add("Lỗi kết nối nhấn Run lại!"); });
+                Console.WriteLine(e);
+            }
         }
     }
 
@@ -438,8 +453,8 @@ public class HuflitPortal
                 {
                     if (!_isRegistered.TryGetValue(se, out var status)) continue;
                     if (status) continue;
-                    
-                    
+
+
                     var statusRegisterCookieByClassCodeFormat = await RegisterCookieByClassCodeFormat(se);
                     _isRegistered[se] = statusRegisterCookieByClassCodeFormat;
                 }
