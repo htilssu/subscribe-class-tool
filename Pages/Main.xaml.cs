@@ -71,7 +71,12 @@ internal partial class Main
 
         try
         {
-            if (!_loginType) { await _huflitPortal.ConnectToDkmh(); }
+            if (!_loginType)
+            {
+                var dicAuth = HuflitPortal.ParseCookie(TbCookie.Text.Replace(Environment.NewLine, ""));
+                _huflitPortal.UserDkmh = new UserService.UserDKMH(dicAuth["User"], dicAuth["UserPW"]);
+                await _huflitPortal.ConnectToDkmh();
+            }
             else { await _huflitPortal.RegisterCookieToServer(); }
 
             _huflitPortal.RunOptimized(listClass, ListBoxState);
@@ -85,7 +90,8 @@ internal partial class Main
     private async void BtnCheckLogin_OnClick(object sender, RoutedEventArgs e)
     {
         if (!_loginType) return;
-        _huflitPortal.SetCookie("ASP.NET_SessionId=" + TbCookie.Text.Replace(Environment.NewLine, ""));
+        var dicAuth = HuflitPortal.ParseCookie("ASP.NET_SessionId="+TbCookie.Text.Replace(Environment.NewLine, ""));
+        _huflitPortal.SetCookie(dicAuth);
         var res = await _huflitPortal.CheckCookie();
         ListBoxState.Items.Add(res != null ? "Cookie hợp lệ" : "Cookie không hợp lệ");
         if (res == null) return;

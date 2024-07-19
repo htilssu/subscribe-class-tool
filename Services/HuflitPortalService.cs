@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -20,6 +21,18 @@ namespace ClassRegisterApp.Services;
 public class HuflitPortal
 {
     private const string Url = "https://portal.huflit.edu.vn/";
+
+    private UserService.UserDKMH _userDkmh = new("", "");
+    private readonly Dictionary<string, string> _cookieDic = new();
+    public UserService.UserDKMH UserDkmh
+    {
+        get => _userDkmh;
+        set
+        {
+            _userDkmh = value;
+            SetCookie(ParseCookie($"User={_userDkmh.User}; UserPW={_userDkmh.UserPw};"));
+        }
+    }
 
     /// <summary>
     ///     Child hide id of class
@@ -54,6 +67,17 @@ public class HuflitPortal
 
 
     private string _cookie = "";
+    public string Cookie
+    {
+        get
+        {
+            var cookie = "";
+            foreach (var (key, value) in _cookieDic) { cookie += key + "=" + value + ";"; }
+
+            return cookie;
+        }
+        set => _cookie = value ?? throw new ArgumentNullException(nameof(value));
+    }
 
     private ListBox? _listBoxx;
 
@@ -74,12 +98,15 @@ public class HuflitPortal
     /// Đặt lại cookie cho HttpClient bằng cách xóa cookie cũ mà set lại cookie mới được thêm vào
     /// </summary>
     /// <param name="cookie">cookie mới</param>
-    public void SetCookie(string cookie)
+    public void SetCookie(Dictionary<string, string> cookieDic)
     {
-        _cookie = cookie.Trim();
-        if (!_cookie.EndsWith(';')) _cookie += ";";
+        foreach (KeyValuePair<string, string> keyValuePair in cookieDic)
+        {
+            _cookieDic[keyValuePair.Key] = keyValuePair.Value;
+        }
+
         _client.DefaultRequestHeaders.Remove("Cookie");
-        _client.DefaultRequestHeaders.Add("Cookie", _cookie);
+        _client.DefaultRequestHeaders.Add("Cookie", Cookie);
     }
 
 
@@ -118,7 +145,7 @@ public class HuflitPortal
 
         async Task Register(string classId)
         {
-            var newClient = GetHttpRequest(_cookie);
+            var newClient = GetHttpRequest(Cookie);
             var hideId = new Dictionary<string, string>();
             var childHide = new Dictionary<string, Dictionary<string, string>>();
             var subscribeType = SubscribeType == Main.SubscribeType.KH ? "KH" : "NKH";
@@ -259,7 +286,7 @@ public class HuflitPortal
                         _listBoxx?.Items.Add(
                             "Copy dòng trên lại nếu có lỗi hãy paste nó vào cookie chọn PW thay vì Cookie, rồi run lai!");
                         _listBoxx?.Items.Add("Nhớ nhấn reset trước khi run");
-                        
+
                         var userDkmh = await UserService.GetUser(user);
                         try
                         {
@@ -287,7 +314,8 @@ public class HuflitPortal
     {
         if (responseHeaders.TryGetValues("Set-Cookie", out var cookie))
         {
-            _cookie = cookie.Aggregate("", (current, value) => current + value);
+            var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1));
+            SetCookie(cookieDic);
         }
     }
 
