@@ -57,6 +57,11 @@ public class HuflitPortal
 
     private readonly Dictionary<string, bool> _isRegistered = new();
 
+    public void ClearIsRegistered()
+    {
+        _isRegistered.Clear();
+    }
+
     public bool IsRegisterCookie
     {
         get => _isRegisterCookie;
@@ -155,12 +160,7 @@ public class HuflitPortal
                 response =
                     await newClient.GetAsync(
                         $"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachLopHocPhan?id={classId}&registType={subscribeType}");
-            } catch (Exception)
-            {
-                _listBoxx?.Items.Add($"Lỗi khi lấy danh lớp học phần của {classId}");
-                return;
-            }
-
+                
             listBox.Items.Add($"Đang lấy thông tin {classId} ...");
             var content = await response.Content.ReadAsStringAsync();
             var contentDocument = new HtmlDocument();
@@ -258,6 +258,10 @@ public class HuflitPortal
 
                     break;
                 }
+            } catch (Exception)
+            {
+                _listBoxx?.Items.Add($"Lỗi khi lấy danh lớp học phần của {classId}");
+            }
         }
     }
 
@@ -274,11 +278,17 @@ public class HuflitPortal
         {
             try
             {
-                var registerResponse = await _client.GetAsync(Url + "/Home/DangKyHocPhan");
+                var httpClient = new HttpClient(new HttpClientHandler()
+                {
+                    AllowAutoRedirect = false,
+                });
+                
+                httpClient.DefaultRequestHeaders.Add("Cookie", Cookie);
+                var registerResponse = await httpClient.GetAsync(Url + "/Home/DangKyHocPhan");
 
                 if (registerResponse.Headers.TryGetValues("Set-Cookie", out var cookie))
                 {
-                    var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1));
+                    var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1+";"));
                     if (cookieDic.TryGetValue("User", out var user)
                         && cookieDic.TryGetValue("UserPW", out var userPw))
                     {
@@ -286,11 +296,10 @@ public class HuflitPortal
                         _listBoxx?.Items.Add(
                             "Copy dòng trên lại nếu có lỗi hãy paste nó vào cookie chọn PW thay vì Cookie, rồi run lai!");
                         _listBoxx?.Items.Add("Nhớ nhấn reset trước khi run");
-
-                        var userDkmh = await UserService.GetUser(user);
+                        
                         try
                         {
-                            if (userDkmh == null) { UserService.SaveUser(user, userPw); }
+                           UserService.SaveUser(user, userPw); 
                         } catch (Exception e)
                         {
                             Console.WriteLine(e);
@@ -314,7 +323,7 @@ public class HuflitPortal
     {
         if (responseHeaders.TryGetValues("Set-Cookie", out var cookie))
         {
-            var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1));
+            var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1+";"));
             SetCookie(cookieDic);
         }
     }
@@ -465,26 +474,19 @@ public class HuflitPortal
     {
         while (_isRegistered.ContainsValue(false))
         {
-            var classList = await SecretService.GetAllSecrets();
-            if (classList.Length == 0) return;
-            foreach (var @class in classList)
+            var falseList = _isRegistered.Where(pair => !pair.Value).Select(pair => pair.Key).ToList();
+            foreach (var se in falseList)
             {
-                _secretClassList.TryAdd(@class.Id, @class.Secret);
-                var childDic
-                    = @class.Children.ToDictionary(classChild => classChild.Id, classChild => classChild.Secret);
-                _classChild.TryAdd(@class.Id, childDic);
-            }
+                var classList = se.Split("-");
+                var @class = await SecretService.GetSecret(classList[0]);
+                if (@class == null) return;
 
-            if (_targetRegisterClass != null)
-            {
-                foreach (var se in _targetRegisterClass)
+                if (classList.Length == 1) await RegisterBySecret(@class.Secret);
+                else
                 {
-                    if (!_isRegistered.TryGetValue(se, out var status)) continue;
-                    if (status) continue;
-
-
-                    var statusRegisterCookieByClassCodeFormat = await RegisterCookieByClassCodeFormat(se);
-                    _isRegistered[se] = statusRegisterCookieByClassCodeFormat;
+                    var child = @class.GetChild(classList[1]);
+                    if (child == null) return;
+                    await RegisterBySecret(@class.Secret + "|" + child.Secret + "|");
                 }
             }
 
@@ -493,26 +495,11 @@ public class HuflitPortal
         }
     }
 
-    private async Task<bool> RegisterCookieByClassCodeFormat(string se)
-    {
-        var secretCode = "";
-
-        var classList = se.Split("-");
-        if (_classHideId.TryGetValue(classList[0], out var secret)) { secretCode += secret; }
-
-        if (classList.Length < 2) return await RegisterBySecret(secretCode);
-
-
-        if (_classHideId.TryGetValue(classList[1], out secret)) { secretCode += "|" + secret + "|"; }
-
-        return await RegisterBySecret(secretCode);
-    }
-
     private async Task<bool> RegisterBySecret(string secret)
     {
-        var httpClient = GetHttpRequest(_cookie);
         try
         {
+            var httpClient = GetHttpRequest(Cookie);
             var response = await httpClient.GetAsync(
                 $"https://dkmh.huflit.edu.vn/DangKyHocPhan/RegistUpdateScheduleStudyUnit?Hide={secret}&ScheduleStudyUnitOld=&acceptConflict=");
 
@@ -523,7 +510,7 @@ public class HuflitPortal
             return true;
         } catch (Exception e)
         {
-            Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add("Lỗi khi đăng ký"); });
+            Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add("Lỗi khi đăng ký fetch"); });
             Console.WriteLine(e);
         }
 

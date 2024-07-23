@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using ClassRegisterApp.Models;
 
@@ -20,10 +21,11 @@ public static class SecretService
 
     public static async Task<Class?> GetSecret(string classId)
     {
-        var response = await _httpClient.GetAsync(Url + "?classId=" + classId);
-        if (!response.IsSuccessStatusCode) return null;
+        
         try
         {
+            var response = await _httpClient.GetAsync(Url + "?id=" + classId);
+            if (!response.IsSuccessStatusCode) return null;
             var cClass = await response.Content.ReadFromJsonAsync<Class>();
             return cClass;
         } catch (Exception e) { Console.WriteLine(e); }
@@ -37,7 +39,9 @@ public static class SecretService
         {
             var response = await _httpClient.GetAsync(Url);
             if (!response.IsSuccessStatusCode) return [];
-            var cClasses = await response.Content.ReadFromJsonAsync<Class[]>();
+            var cClasses =
+                await response.Content.ReadFromJsonAsync<Class[]>(
+                    new JsonSerializerOptions(JsonSerializerDefaults.Web));
             return cClasses ?? [];
         } catch (Exception e) { Console.WriteLine(e); }
 
@@ -48,7 +52,8 @@ public static class SecretService
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync(Url, @class);
+            var response =
+                await _httpClient.PostAsJsonAsync(Url, @class, new JsonSerializerOptions(JsonSerializerDefaults.Web));
             return response.IsSuccessStatusCode;
         } catch (Exception e) { Console.WriteLine(e); }
 

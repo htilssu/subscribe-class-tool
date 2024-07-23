@@ -130,5 +130,6 @@ internal partial class Main
     private void ResetButton_OnClick(object sender, RoutedEventArgs e)
     {
         _huflitPortal.IsRegisterCookie = false;
+        _huflitPortal.ClearIsRegistered();
     }
 }
