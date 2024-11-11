@@ -18,6 +18,10 @@ public class User
     }
 
 
+    /// <summary>
+    /// Username
+    /// </summary>
+    /// <exception cref="ArgumentNullException"></exception>
     public string UserName
     {
         get => _userName;

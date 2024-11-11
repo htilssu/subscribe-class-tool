@@ -4,8 +4,7 @@
         <OutputType>WinExe</OutputType>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
-        <PackageIcon>huflit-logo.png</PackageIcon>
-        <LangVersion>12</LangVersion>
+        <LangVersion>default</LangVersion>
         <ApplicationIcon>Images\huflit-logo.ico</ApplicationIcon>
         <Title>A application for regist course huflit</Title>
         <Authors>Hisu</Authors>
@@ -16,23 +15,14 @@
         <AssemblyVersion>1.0.1</AssemblyVersion>
         <FileVersion>1.0.1</FileVersion>
         <PublicSign>false</PublicSign>
-        <TargetFrameworks>net8.0-windows;net6.0-windows</TargetFrameworks>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <DocumentationFile>bin\Release\ClassRegisterApp.xml</DocumentationFile>
     </PropertyGroup>
-
-
-    <ItemGroup>
-        <PackageReference Include="dnlib" Version="4.4.0" />
-        <PackageReference Include="HtmlAgilityPack" Version="1.11.59" />
-        <PackageReference Include="MongoDB.Bson" Version="2.24.0" />
-        <PackageReference Include="Obfuscar" Version="2.2.38">
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-          <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
-    </ItemGroup>
 
 
     <ItemGroup>
@@ -60,6 +50,15 @@
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <PackageReference Include="DnsClient" Version="1.8.0" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.68" />
+      <PackageReference Include="MongoDB.Bson" Version="3.0.0" />
+      <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
     
 

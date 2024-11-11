@@ -7,7 +7,7 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         MinHeight="360" MinWidth="450"
-        Title="Đăng ký môn HUFLIT" Height="360" Width="450" x:ClassModifier="internal">
+        Title="Đăng ký môn HUFLIT" Height="360" Width="450">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="100" />
@@ -23,31 +23,29 @@
             <TextBox KeyDown="OnEnterLogin" FontSize="16" Height="25" Name="CodeTextBox" />
         </StackPanel>
         <StackPanel Grid.Row="2" Margin="0, 50" VerticalAlignment="Center">
-            <Grid>
-                <Button Click="LoginBtn_OnClick" Content="Login" Name="LoginBtn" FontWeight="700"
-                        Foreground="White"
-                        Background="Gray" Margin="0,15,0,0" Width="100" Height="30">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border CornerRadius="5" Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
-                        </ControlTemplate>
-                    </Button.Template>
+            <Button Click="LoginBtn_OnClick" Content="Login" Name="LoginBtn" FontWeight="700"
+                    Foreground="White"
+                    Background="Gray" Margin="0,15,0,0" Width="100" Height="30">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="5" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
 
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="Black" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </Grid>
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Black" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
         </StackPanel>
     </Grid>
 </Window>

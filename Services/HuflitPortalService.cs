@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -135,7 +134,7 @@ public class HuflitPortal
             return;
         }
 
-        StartFetchSecret();
+        // StartFetchSecret();
         RegistrySubject(subjectIdList, classListCode, listBox);
     }
 
@@ -255,8 +254,6 @@ public class HuflitPortal
                         listBox.Items.Add($"Lỗi khi đăng ký {code}");
                         Console.WriteLine(e);
                     }
-
-                    break;
                 }
             } catch (Exception)
             {
@@ -495,7 +492,7 @@ public class HuflitPortal
         }
     }
 
-    private async Task<bool> RegisterBySecret(string secret)
+    private async Task RegisterBySecret(string secret)
     {
         try
         {
@@ -507,14 +504,11 @@ public class HuflitPortal
 
 
             Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add(status?.Msg); });
-            return true;
+            return;
         } catch (Exception e)
         {
             Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add("Lỗi khi đăng ký fetch"); });
-            Console.WriteLine(e);
         }
-
-        return false;
     }
 
 

@@ -7,9 +7,9 @@ namespace ClassRegisterApp.Models;
 
 public class Class
 {
-    private string id;
-    private string secret;
-    private List<Class> children = [];
+    private string _id;
+    private string _secret;
+    private List<Class> _children = [];
 
     /// <summary>
     /// Khởi tạo lớp
@@ -18,8 +18,8 @@ public class Class
     /// <param name="secret">mã secret của class</param>
     public Class(string id, string secret)
     {
-        this.id = id;
-        this.secret = secret;
+        this._id = id;
+        this._secret = secret;
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ public class Class
     /// <returns></returns>
     public bool HasChildren()
     {
-        return children.Count > 0;
+        return _children.Count > 0;
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public class Class
     /// <returns>Class thực hành</returns>
     public Class? GetChild(string childId)
     {
-        return children.Find(c => c.Id == childId);
+        return _children.Find(c => c.Id == childId);
     }
 
 
@@ -49,23 +49,35 @@ public class Class
     /// <param name="child">Lớp thực hành</param>
     public void AddChild(Class child)
     {
-        children.Add(child);
+        _children.Add(child);
     }
 
+    /// <summary>
+    /// Id của class
+    /// </summary>
+    /// <exception cref="ArgumentNullException"></exception>
     public string Id
     {
-        get => id;
-        set => id = value ?? throw new ArgumentNullException(nameof(value));
+        get => _id;
+        set => _id = value ?? throw new ArgumentNullException(nameof(value));
     }
+    /// <summary>
+    /// Mã secret của class
+    /// </summary>
+    /// <exception cref="ArgumentNullException"></exception>
     public string Secret
     {
-        get => secret;
-        set => secret = value ?? throw new ArgumentNullException(nameof(value));
+        get => _secret;
+        set => _secret = value ?? throw new ArgumentNullException(nameof(value));
     }
+    /// <summary>
+    /// Danh sách các lớp thực hành của lớp lý thuyết hiện tại
+    /// </summary>
+    /// <exception cref="ArgumentNullException"></exception>
     public List<Class> Children
     {
-        get => children;
-        set => children = value ?? throw new ArgumentNullException(nameof(value));
+        get => _children;
+        set => _children = value ?? throw new ArgumentNullException(nameof(value));
     }
 }
 

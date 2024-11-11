@@ -7,7 +7,7 @@ namespace ClassRegisterApp.Pages;
 /// <summary>
 ///     Interaction logic for MainWindow.xaml
 /// </summary>
-internal partial class Authenticator
+public partial class Authenticator
 {
     private readonly CodeService _codeService;
     bool _isLogging = false;
@@ -15,7 +15,6 @@ internal partial class Authenticator
     public Authenticator()
     {
         InitializeComponent();
-        WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Icon = ImageHelper.GetEmbeddedImage("huflit-logo.ico");
         AuthImage.Source = Icon;
 
@@ -34,7 +33,7 @@ internal partial class Authenticator
             MessageBox.Show("Code sai!!", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
-
+        
         var main = new Main(code);
         main.Show();
         Close();
