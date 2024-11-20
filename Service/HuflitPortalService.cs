@@ -8,11 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using ClassRegisterApp.Models;
-using ClassRegisterApp.Pages;
+using ClassRegisterApp.Model;
 using HtmlAgilityPack;
+using Main = ClassRegisterApp.Page.Main;
 
-namespace ClassRegisterApp.Services;
+namespace ClassRegisterApp.Service;
 
 /// <summary>
 /// Lớp hỗ trợ tương tác với portal của trường
@@ -71,7 +71,7 @@ public class HuflitPortal
 
 
     private string _cookie = "";
-    public string Cookie
+    private string Cookie
     {
         get
         {
@@ -80,7 +80,6 @@ public class HuflitPortal
 
             return cookie;
         }
-        set => _cookie = value ?? throw new ArgumentNullException(nameof(value));
     }
 
     private ListBox? _listBoxx;
@@ -504,7 +503,6 @@ public class HuflitPortal
 
 
             Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add(status?.Msg); });
-            return;
         } catch (Exception e)
         {
             Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add("Lỗi khi đăng ký fetch"); });

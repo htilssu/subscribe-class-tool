@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ClassRegisterApp.Models;
+namespace ClassRegisterApp.Model;
 
 public class Class
 {

@@ -1,12 +1,11 @@
 ﻿using System.Windows;
 using System.Windows.Input;
-using ClassRegisterApp.Services;
+using ClassRegisterApp.Service;
+using ClassRegisterApp.Service;
 
-namespace ClassRegisterApp.Pages;
+namespace ClassRegisterApp.Page;
 
-/// <summary>
-///     Interaction logic for MainWindow.xaml
-/// </summary>
+
 public partial class Authenticator
 {
     private readonly CodeService _codeService;
@@ -24,17 +23,17 @@ public partial class Authenticator
 
     private async void LoginBtn_OnClick(object sender, RoutedEventArgs e)
     {
-        if (_isLogging) return; // Prevent multiple login
+        if (_isLogging) return; // Prevent spam login
         _isLogging = true;
-        var code = await _codeService.CheckCodeAsync(CodeTextBox.Text);
+        var code = await CodeService.VerifyCodeAsync(CodeTextBox.Text);
         _isLogging = false;
-        if (code == null)
+        if (!code.IsOk)
         {
             MessageBox.Show("Code sai!!", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
-        
-        var main = new Main(code);
+
+        var main = new Main(code.Result!);
         main.Show();
         Close();
     }

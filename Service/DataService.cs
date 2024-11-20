@@ -2,7 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassRegisterApp.Services;
+namespace ClassRegisterApp.Service;
 
 public class DataService
 {

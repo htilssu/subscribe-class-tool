@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
         <LangVersion>default</LangVersion>
-        <ApplicationIcon>Images\huflit-logo.ico</ApplicationIcon>
+        <ApplicationIcon>Image\huflit-logo.ico</ApplicationIcon>
         <Title>A application for regist course huflit</Title>
         <Authors>Hisu</Authors>
         <Description>A application for regist course huflit</Description>
@@ -27,11 +27,11 @@
 
     <ItemGroup>
         <None Remove="Images\huflit-logo.ico" />
-        <EmbeddedResource Include="Images\huflit-logo.ico">
+        <EmbeddedResource Include="Image\huflit-logo.ico">
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </EmbeddedResource>
         <None Remove="Images\huflit-logo.png" />
-        <EmbeddedResource Include="Images\huflit-logo.png">
+        <EmbeddedResource Include="Image\huflit-logo.png">
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </EmbeddedResource>
         <None Remove="huflit-logo.png" />

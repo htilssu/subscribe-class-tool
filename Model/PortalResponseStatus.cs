@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace ClassRegisterApp.Models;
+namespace ClassRegisterApp.Model;
 
 /// <summary>
 ///     Present Status response from server

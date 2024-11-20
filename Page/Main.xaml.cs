@@ -4,10 +4,11 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using ClassRegisterApp.Models;
-using ClassRegisterApp.Services;
+using ClassRegisterApp.Model;
+using ClassRegisterApp.Service;
+using ClassRegisterApp.Service;
 
-namespace ClassRegisterApp.Pages;
+namespace ClassRegisterApp.Page;
 
 internal partial class Main
 {
@@ -37,7 +38,7 @@ internal partial class Main
     {
         _huflitPortal = new HuflitPortal
         {
-            Delay = code.Delay * 1000,
+            // Delay = code.Delay * 1000,
             SubscribeType = _subscribeType
         };
         InitializeComponent();
