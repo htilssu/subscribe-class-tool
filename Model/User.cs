@@ -7,24 +7,69 @@ namespace ClassRegisterApp.Model;
 /// </summary>
 public class User
 {
-    private string _userName;
-
-    /// <summary>
-    /// </summary>
-    /// <param name="userName">Username to login</param>
-    public User(string userName)
+    private string _fullname;
+    private string _userPw;
+    private string _userI;
+    private string _cookie;
+    private bool _isLogin;
+    private bool _isLogByCookie;
+    public string Cookie
     {
-        _userName = userName;
+        get => _cookie;
+        set => _cookie = value ?? throw new ArgumentNullException(nameof(value));
+    }
+    public bool IsLogin
+    {
+        get => _isLogin;
+        set => _isLogin = value;
+    }
+    public bool IsLogByCookie
+    {
+        get => _isLogByCookie;
+        set => _isLogByCookie = value;
     }
 
-
     /// <summary>
-    /// Username
+    /// Create new userI object
     /// </summary>
-    /// <exception cref="ArgumentNullException"></exception>
-    public string UserName
+    /// <param name="fullname">FullName</param>
+    /// <param name="userPw">User Identity Password</param>
+    /// <param name="userI">UserId</param>
+    public User(string fullname, string userPw, string userI)
     {
-        get => _userName;
-        set => _userName = value ?? throw new ArgumentNullException(nameof(value));
+        _fullname = fullname;
+        _userPw = userPw;
+        _userI = userI;
+    }
+    /// <summary>
+    /// Create new user object with empty value
+    /// </summary>
+    public User()
+    {
+        _fullname = "";
+        _userPw = "";
+        _userI = "";
+    }
+    /// <summary>
+    /// Get the user's fullname
+    /// </summary>
+    public string Fullname
+    {
+        get => _fullname;
+    }
+    /// <summary>
+    ///Get the user's password
+    /// </summary>
+    public string UserPw
+    {
+        get => _userPw;
+    }
+    /// <summary>
+    /// Get the user's identity
+    /// <p>Thường là mã số sinh viên</p>
+    /// </summary>
+    public string UserI
+    {
+        get => _userI;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace ClassRegisterApp.Model;
 
@@ -55,6 +56,7 @@ public class Class
     /// Id của class
     /// </summary>
     /// <exception cref="ArgumentNullException"></exception>
+    [JsonProperty("id")]
     public string Id
     {
         get => _id;
@@ -64,6 +66,7 @@ public class Class
     /// Mã secret của class
     /// </summary>
     /// <exception cref="ArgumentNullException"></exception>
+    [JsonProperty("secret")]
     public string Secret
     {
         get => _secret;
@@ -73,6 +76,7 @@ public class Class
     /// Danh sách các lớp thực hành của lớp lý thuyết hiện tại
     /// </summary>
     /// <exception cref="ArgumentNullException"></exception>
+    [JsonProperty("children")]
     public List<Class> Children
     {
         get => _children;

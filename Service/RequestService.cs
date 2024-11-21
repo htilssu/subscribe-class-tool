@@ -20,13 +20,18 @@ public class RequestService
         var response = await httpClient.GetAsync(endpoint);
         try
         {
-            if (!response.IsSuccessStatusCode) return RequestResult.Fail<T>(HttpStatusCode.BadRequest);
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Request failed endpoint: {endpoint}, status code: {response.StatusCode}");
+                return RequestResult.Fail<T>(HttpStatusCode.BadRequest);
+            }
 
             var result = await response.Content.ReadFromJsonAsync<T>();
 
             return result == null ? RequestResult.Fail<T>(HttpStatusCode.BadRequest) : RequestResult.Ok(result);
         } catch (JsonException e)
         {
+            Console.WriteLine(e.Message);
             return RequestResult.Fail<T>(HttpStatusCode.BadRequest);
         }
     }
@@ -47,8 +52,8 @@ public class RequestService
 
         } catch (JsonException e)
         {
-            Console.WriteLine(e);
-            throw;
+            Console.WriteLine(e.Message);
+            return RequestResult.Fail<T>(HttpStatusCode.BadRequest);
         }
     }
 

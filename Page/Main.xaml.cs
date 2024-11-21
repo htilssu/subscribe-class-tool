@@ -6,11 +6,10 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using ClassRegisterApp.Model;
 using ClassRegisterApp.Service;
-using ClassRegisterApp.Service;
 
 namespace ClassRegisterApp.Page;
 
-internal partial class Main
+public partial class Main
 {
     public enum SubscribeType
     {
@@ -44,7 +43,6 @@ internal partial class Main
         InitializeComponent();
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Icon = ImageHelper.GetEmbeddedImage("huflit-logo.ico");
-        KH.IsChecked = true;
     }
 
     public Main()
@@ -93,10 +91,10 @@ internal partial class Main
         if (!_loginType) return;
         var dicAuth = HuflitPortal.ParseCookie("ASP.NET_SessionId="+TbCookie.Text.Replace(Environment.NewLine, ""));
         _huflitPortal.SetCookie(dicAuth);
-        var res = await _huflitPortal.CheckCookie();
-        ListBoxState.Items.Add(res != null ? "Cookie hợp lệ" : "Cookie không hợp lệ");
-        if (res == null) return;
-        ListBoxState.Items.Add(res.UserName);
+        var user = await _huflitPortal.CheckCookie();
+        ListBoxState.Items.Add(user != null ? "Cookie hợp lệ" : "Cookie không hợp lệ");
+        if (user == null) return;
+        ListBoxState.Items.Add(user.Fullname);
     }
 
 

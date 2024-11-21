@@ -22,6 +22,13 @@ public class HuflitPortal
     private const string Url = "https://portal.huflit.edu.vn/";
 
     private UserService.UserDKMH _userDkmh = new("", "");
+    private ClassService _classService = new();
+    private List<User> _users = [];
+    private Thread _thread = null!;
+    public void AddUser(User user)
+    {
+        _users.Add(user);
+    }
     private readonly Dictionary<string, string> _cookieDic = new();
     public UserService.UserDKMH UserDkmh
     {
@@ -84,7 +91,7 @@ public class HuflitPortal
 
     private ListBox? _listBoxx;
 
-    internal Main.SubscribeType SubscribeType { get; init; }
+    internal Main.SubscribeType SubscribeType { get; set; } = Main.SubscribeType.KH;
 
 
     public int Delay { get; init; }
@@ -118,6 +125,7 @@ public class HuflitPortal
     /// </summary>
     /// <param name="classListCode">Danh sách lớp học cần đăng ký</param>
     /// <param name="listBox">listBox hiển thị trạng thái đăng ký</param>
+    /// <param name="kh"></param>
     public async void RunOptimized(List<string> classListCode, ListBox listBox)
     {
         _listBoxx = listBox;
@@ -125,15 +133,24 @@ public class HuflitPortal
         {
             _isRegistered.TryAdd(c, false); //mark all class as not registered
         });
+        StartFetchSecret();
         _targetRegisterClass = new List<string>(classListCode);
-        var subjectIdList = await GetSubjectIdList();
+        var subjectIdList = await GetSubjectIdList(Main.SubscribeType.KH);
         if (subjectIdList == null)
         {
             listBox.Items.Add("Không tìm thấy danh sách học phần, hãy Run lại");
             return;
         }
 
-        // StartFetchSecret();
+        SubscribeType = Main.SubscribeType.KH;
+        RegistrySubject(subjectIdList, classListCode, listBox);
+        var nkhSubjectIdList = await GetSubjectIdList(Main.SubscribeType.NKH);
+        if (nkhSubjectIdList == null)
+        {
+            _listBoxx.Items.Add("Không tìm thấy danh sách học phần ngoài kế hooạch, hãy Run lại");
+        }
+
+        SubscribeType = Main.SubscribeType.NKH;
         RegistrySubject(subjectIdList, classListCode, listBox);
     }
 
@@ -158,102 +175,103 @@ public class HuflitPortal
                 response =
                     await newClient.GetAsync(
                         $"https://dkmh.huflit.edu.vn/DangKyHocPhan/DanhSachLopHocPhan?id={classId}&registType={subscribeType}");
-                
-            listBox.Items.Add($"Đang lấy thông tin {classId} ...");
-            var content = await response.Content.ReadAsStringAsync();
-            var contentDocument = new HtmlDocument();
-            contentDocument.LoadHtml(content);
 
-            var inputList = contentDocument.DocumentNode.SelectNodes("//form//tbody//input[@type='radio']");
+                listBox.Items.Add($"Đang lấy thông tin {classId} ...");
+                var content = await response.Content.ReadAsStringAsync();
+                var contentDocument = new HtmlDocument();
+                contentDocument.LoadHtml(content);
 
-            if (inputList != null)
-                foreach (var node in inputList)
-                {
-                    var secret = node.GetAttributeValue("id", "");
-                    var onClickAttributeValue = node.GetAttributeValue("onclick", "");
-                    var childHideIdDictionary = new Dictionary<string, string>();
-                    var classCode = "";
-                    if (onClickAttributeValue != "")
+                var inputList = contentDocument.DocumentNode.SelectNodes("//form//tbody//input[@type='radio']");
+
+                if (inputList != null)
+                    foreach (var node in inputList)
                     {
-                        classCode = GetSubjectId(onClickAttributeValue);
-                        var childList =
-                            contentDocument.DocumentNode.SelectNodes(
-                                $"//form//tr[@id='tr-of-{classCode}']//input[@type='radio']");
-
-                        var childClassList =
-                            contentDocument.DocumentNode.SelectNodes($"//form//tr[@id='tr-of-{classCode}']//tr");
-
-                        if (childList != null)
+                        var secret = node.GetAttributeValue("id", "");
+                        var onClickAttributeValue = node.GetAttributeValue("onclick", "");
+                        var childHideIdDictionary = new Dictionary<string, string>();
+                        var classCode = "";
+                        if (onClickAttributeValue != "")
                         {
-                            var index = 1;
-                            foreach (var child in childList)
+                            classCode = GetSubjectId(onClickAttributeValue);
+                            var childList =
+                                contentDocument.DocumentNode.SelectNodes(
+                                    $"//form//tr[@id='tr-of-{classCode}']//input[@type='radio']");
+
+                            var childClassList =
+                                contentDocument.DocumentNode.SelectNodes($"//form//tr[@id='tr-of-{classCode}']//tr");
+
+                            if (childList != null)
                             {
-                                var tdList = childClassList[index].SelectNodes(".//td");
-                                var childHideId = child.GetAttributeValue("id", "");
-                                if (childHideId != "") childHideIdDictionary.TryAdd(tdList[1].InnerText, childHideId);
-                                index++;
+                                var index = 1;
+                                foreach (var child in childList)
+                                {
+                                    var tdList = childClassList[index].SelectNodes(".//td");
+                                    var childHideId = child.GetAttributeValue("id", "");
+                                    if (childHideId != "") childHideIdDictionary.TryAdd(tdList[1].InnerText, childHideId);
+                                    index++;
+                                }
                             }
                         }
+
+                        if (secret.Contains("tr-of-") || classCode == "") continue;
+                        _classHideId.TryAdd(classCode, secret);
+                        _classChild.TryAdd(classCode, childHideIdDictionary);
+                        hideId.TryAdd(classCode, secret);
+                        childHide.TryAdd(classCode, childHideIdDictionary);
                     }
 
-                    if (secret.Contains("tr-of-") || classCode == "") continue;
-                    _classHideId.TryAdd(classCode, secret);
-                    _classChild.TryAdd(classCode, childHideIdDictionary);
-                    hideId.TryAdd(classCode, secret);
-                    childHide.TryAdd(classCode, childHideIdDictionary);
-                }
-
-            foreach (var code in classListCode)
-                if (hideId.ContainsKey(code) || hideId.ContainsKey(code.Split('-')[0]))
-                {
-                    var registerHide = "";
-                    if (code.Contains('-'))
+                foreach (var code in classListCode)
+                    if (hideId.ContainsKey(code) || hideId.ContainsKey(code.Split('-')[0]))
                     {
-                        var split = code.Split('-');
-                        var lt = split[0];
-                        var th = split[1];
-                        hideId.TryGetValue(lt, out var ltHideId);
-                        if (childHide.TryGetValue(lt, out var dicChildHide))
+                        var registerHide = "";
+                        if (code.Contains('-'))
                         {
-                            dicChildHide.TryGetValue(th, out var thHideId);
-                            registerHide = ltHideId + "|" + thHideId + "|";
+                            var split = code.Split('-');
+                            var lt = split[0];
+                            var th = split[1];
+                            hideId.TryGetValue(lt, out var ltHideId);
+                            if (childHide.TryGetValue(lt, out var dicChildHide))
+                            {
+                                dicChildHide.TryGetValue(th, out var thHideId);
+                                registerHide = ltHideId + "|" + thHideId + "|";
+                            }
                         }
-                    }
-                    else
-                    {
-                        hideId.TryGetValue(code, out var value);
-                        registerHide = value;
-                    }
-
-                    listBox.Items.Add($"Đang đăng ký {code}...");
-                    try
-                    {
-                        var responseRegistry = await newClient.GetAsync(
-                            $"https://dkmh.huflit.edu.vn/DangKyHocPhan/RegistUpdateScheduleStudyUnit?Hide={registerHide}&ScheduleStudyUnitOld=&acceptConflict=");
-
-                        var classList = SecretService.ConvertDicToClass(hideId, childHide);
-                        if (classList != null)
+                        else
                         {
-                            foreach (var @class in classList) { _ = await SecretService.AddSecret(@class); }
+                            hideId.TryGetValue(code, out var value);
+                            registerHide = value;
                         }
 
-                        var status = await responseRegistry.Content.ReadFromJsonAsync<PortalResponseStatus>();
-
-                        listBox.Items.Add(status?.Msg + $" {code}");
-                        if (status?.Msg?.Contains("thành công") == true)
+                        listBox.Items.Add($"Đang đăng ký {code}...");
+                        try
                         {
-                            if (_isRegistered.ContainsKey(code)) { _isRegistered[code] = true; }
+                            var responseRegistry = await newClient.GetAsync(
+                                $"https://dkmh.huflit.edu.vn/DangKyHocPhan/RegistUpdateScheduleStudyUnit?Hide={registerHide}&ScheduleStudyUnitOld=&acceptConflict=");
+
+                            var classList = SecretService.ConvertDicToClass(hideId, childHide);
+                            if (classList != null)
+                            {
+                                var addSecretTasks = classList.Select(@class => SecretService.AddSecret(@class));
+                                await Task.WhenAll(addSecretTasks);
+                            }
+
+                            var status = await responseRegistry.Content.ReadFromJsonAsync<PortalResponseStatus>();
+
+                            listBox.Items.Add(status?.Msg + $" {code}");
+                            if (status?.Msg?.ToLower().Contains("thành công", StringComparison.CurrentCultureIgnoreCase) == true)
+                            {
+                                if (_isRegistered.ContainsKey(code)) { _isRegistered[code] = true; }
+                            }
+                        } catch (HttpRequestException e)
+                        {
+                            listBox.Items.Add($"Lỗi khi đăng ký {code}");
+                            Console.WriteLine(e);
+                        } catch (Exception e)
+                        {
+                            listBox.Items.Add($"Lỗi khi đăng ký {code}");
+                            Console.WriteLine(e);
                         }
-                    } catch (HttpRequestException e)
-                    {
-                        listBox.Items.Add($"Lỗi khi đăng ký {code}");
-                        Console.WriteLine(e);
-                    } catch (Exception e)
-                    {
-                        listBox.Items.Add($"Lỗi khi đăng ký {code}");
-                        Console.WriteLine(e);
                     }
-                }
             } catch (Exception)
             {
                 _listBoxx?.Items.Add($"Lỗi khi lấy danh lớp học phần của {classId}");
@@ -278,13 +296,13 @@ public class HuflitPortal
                 {
                     AllowAutoRedirect = false,
                 });
-                
+
                 httpClient.DefaultRequestHeaders.Add("Cookie", Cookie);
                 var registerResponse = await httpClient.GetAsync(Url + "/Home/DangKyHocPhan");
 
                 if (registerResponse.Headers.TryGetValues("Set-Cookie", out var cookie))
                 {
-                    var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1+";"));
+                    var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1 + ";"));
                     if (cookieDic.TryGetValue("User", out var user)
                         && cookieDic.TryGetValue("UserPW", out var userPw))
                     {
@@ -292,10 +310,10 @@ public class HuflitPortal
                         _listBoxx?.Items.Add(
                             "Copy dòng trên lại nếu có lỗi hãy paste nó vào cookie chọn PW thay vì Cookie, rồi run lai!");
                         _listBoxx?.Items.Add("Nhớ nhấn reset trước khi run");
-                        
+
                         try
                         {
-                           UserService.SaveUser(user, userPw); 
+                            UserService.SaveUser(user, userPw);
                         } catch (Exception e)
                         {
                             Console.WriteLine(e);
@@ -319,7 +337,7 @@ public class HuflitPortal
     {
         if (responseHeaders.TryGetValues("Set-Cookie", out var cookie))
         {
-            var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1+";"));
+            var cookieDic = ParseCookie(cookie.Aggregate("", (s, s1) => s + s1 + ";"));
             SetCookie(cookieDic);
         }
     }
@@ -351,10 +369,9 @@ public class HuflitPortal
     ///     Get subject ID
     /// </summary>
     /// <returns>A list contain Subject ID to get SecretCode</returns>
-    private async Task<List<string>?> GetSubjectIdList()
+    private async Task<List<string>?> GetSubjectIdList(Main.SubscribeType subscribeType)
     {
         _listBoxx?.Items.Add("Đang lấy danh sách học phần");
-        var subscribeType = SubscribeType == Main.SubscribeType.KH ? "KH" : "NKH";
         HttpResponseMessage response;
         try
         {
@@ -414,7 +431,7 @@ public class HuflitPortal
         var info = document.DocumentNode.SelectNodes("//*[@id=\"menu\"]/ul[2]/li/span/a");
         if (info == null || info[0].InnerText == "Đăng nhập") return null;
 
-        var user = new User(info[0].InnerText);
+        var user = new User();
         return user;
     }
 
@@ -466,28 +483,29 @@ public class HuflitPortal
     }
 
     //len lich cu sau 1 khoang thoi gian thi fetch secret tu secretService  ve
-    private async void FetchSecret()
+    private async Task FetchSecret()
     {
+
         while (_isRegistered.ContainsValue(false))
         {
             var falseList = _isRegistered.Where(pair => !pair.Value).Select(pair => pair.Key).ToList();
             foreach (var se in falseList)
             {
                 var classList = se.Split("-");
-                var @class = await SecretService.GetSecret(classList[0]);
-                if (@class == null) return;
+                var @class = await _classService.GetClassFromRemote(classList[0]);
+                if (@class == null) continue;
 
                 if (classList.Length == 1) await RegisterBySecret(@class.Secret);
                 else
                 {
                     var child = @class.GetChild(classList[1]);
-                    if (child == null) return;
+                    if (child == null) continue;
                     await RegisterBySecret(@class.Secret + "|" + child.Secret + "|");
                 }
             }
 
 
-            await Task.Delay(1000);
+            await Task.Delay(2000);
         }
     }
 
@@ -500,12 +518,9 @@ public class HuflitPortal
                 $"https://dkmh.huflit.edu.vn/DangKyHocPhan/RegistUpdateScheduleStudyUnit?Hide={secret}&ScheduleStudyUnitOld=&acceptConflict=");
 
             var status = await response.Content.ReadFromJsonAsync<PortalResponseStatus>();
-
-
-            Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add(status?.Msg); });
-        } catch (Exception e)
+        } catch (Exception _)
         {
-            Application.Current.Dispatcher.Invoke(() => { _listBoxx?.Items.Add("Lỗi khi đăng ký fetch"); });
+            Console.WriteLine($"Lỗi khi đăng ký secret: {secret}");
         }
     }
 
@@ -515,7 +530,17 @@ public class HuflitPortal
     /// </summary>
     private void StartFetchSecret()
     {
-        Thread fetchSecret = new(FetchSecret);
-        try { fetchSecret.Start(); } catch (Exception e) { Console.WriteLine(e); }
+        _thread = new(() =>
+        {
+            _ = FetchSecret();
+        });
+
+        try
+        {
+            _thread.Start();
+        } catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 }

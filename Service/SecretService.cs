@@ -21,7 +21,7 @@ public static class SecretService
 
     public static async Task<Class?> GetSecret(string classId)
     {
-        
+
         try
         {
             var response = await _httpClient.GetAsync(Url + "?id=" + classId);
@@ -50,14 +50,8 @@ public static class SecretService
 
     public static async Task<bool> AddSecret(Class @class)
     {
-        try
-        {
-            var response =
-                await _httpClient.PostAsJsonAsync(Url, @class, new JsonSerializerOptions(JsonSerializerDefaults.Web));
-            return response.IsSuccessStatusCode;
-        } catch (Exception e) { Console.WriteLine(e); }
-
-        return false;
+        var result = await RequestService.PostAsync<Class>("/v1/secret", @class);
+        return result.IsOk;
     }
 
     public static Class[]? ConvertDicToClass(Dictionary<string, string> baseClass,

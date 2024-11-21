@@ -22,6 +22,11 @@
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <DocumentationFile>bin\Release\ClassRegisterApp.xml</DocumentationFile>
+        <NoWarn>1701;1702;1591</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <NoWarn>1701;1702;1591</NoWarn>
     </PropertyGroup>
 
 
@@ -59,6 +64,11 @@
       <PackageReference Include="MongoDB.Bson" Version="3.0.0" />
       <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <EditorConfigFiles Remove=".editorconfig" />
     </ItemGroup>
     
 
