@@ -4,9 +4,10 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
-using ClassRegisterApp.Model;
+using ClassRegisterApp.Models;
+using ClassRegisterApp.Infrastructure;
 
-namespace ClassRegisterApp.Service;
+namespace ClassRegisterApp.Core;
 
 /// <summary>
 /// 

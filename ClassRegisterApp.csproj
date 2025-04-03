@@ -45,12 +45,12 @@
 
 
     <ItemGroup>
-        <Page Update="Page\Authenticator.xaml">
+        <Page Update="UI\Authenticator.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
-        <Page Update="Page\Main.xaml">
+        <Page Update="UI\Main.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>

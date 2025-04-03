@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace ClassRegisterApp.Service;
+namespace ClassRegisterApp.Infrastructure;
 
 /// <summary>
 /// 

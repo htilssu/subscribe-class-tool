@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace ClassRegisterApp.Model;
+namespace ClassRegisterApp.Models;
 
 public class Code
 {

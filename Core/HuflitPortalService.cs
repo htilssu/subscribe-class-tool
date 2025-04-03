@@ -8,11 +8,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using ClassRegisterApp.Model;
+using ClassRegisterApp.Models;
+using ClassRegisterApp.Infrastructure;
+using ClassRegisterApp.UI;
 using HtmlAgilityPack;
-using Main = ClassRegisterApp.Page.Main;
 
-namespace ClassRegisterApp.Service;
+namespace ClassRegisterApp.Core;
 
 /// <summary>
 /// Lớp hỗ trợ tương tác với portal của trường

@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Windows.Media.Imaging;
 
-namespace ClassRegisterApp.Service;
+namespace ClassRegisterApp.Infrastructure;
 
 internal static class ImageHelper
 {

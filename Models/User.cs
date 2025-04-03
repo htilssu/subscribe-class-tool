@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ClassRegisterApp.Model;
+namespace ClassRegisterApp.Models;
 
 /// <summary>
 ///     A user object contain username and password

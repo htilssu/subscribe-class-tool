@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ClassRegisterApp.Model;
+using ClassRegisterApp.Models;
 
 namespace ClassRegisterApp.ViewModel;
 

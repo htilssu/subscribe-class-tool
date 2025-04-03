@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace ClassRegisterApp.Model;
+namespace ClassRegisterApp.Models;
 
 public class Class
 {

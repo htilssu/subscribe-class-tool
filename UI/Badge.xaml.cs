@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace ClassRegisterApp.Page;
+namespace ClassRegisterApp.UI;
 
 public partial class Badge : UserControl
 {

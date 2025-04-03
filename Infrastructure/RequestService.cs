@@ -4,10 +4,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using ClassRegisterApp.Model;
+using ClassRegisterApp.Models;
 using Newtonsoft.Json;
 
-namespace ClassRegisterApp.Service;
+namespace ClassRegisterApp.Infrastructure;
 
 public class RequestService
 {

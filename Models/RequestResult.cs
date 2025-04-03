@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace ClassRegisterApp.Model;
+namespace ClassRegisterApp.Models;
 
 public class RequestResult<T> where T : class
 {

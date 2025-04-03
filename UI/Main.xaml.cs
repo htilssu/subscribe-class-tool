@@ -4,12 +4,13 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using ClassRegisterApp.Model;
-using ClassRegisterApp.Service;
+using ClassRegisterApp.Models;
+using ClassRegisterApp.Core;
+using ClassRegisterApp.Infrastructure;
 
-namespace ClassRegisterApp.Page;
+namespace ClassRegisterApp.UI;
 
-public partial class Main
+public partial class Main 
 {
     public enum SubscribeType
     {
@@ -37,7 +38,6 @@ public partial class Main
     {
         _huflitPortal = new HuflitPortal
         {
-            // Delay = code.Delay * 1000,
             SubscribeType = _subscribeType
         };
         InitializeComponent();

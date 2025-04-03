@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ClassRegisterApp.Model;
+using ClassRegisterApp.Models;
+using ClassRegisterApp.Infrastructure;
 
-namespace ClassRegisterApp.Service;
+namespace ClassRegisterApp.Core;
 
 public class ClassService
 {
