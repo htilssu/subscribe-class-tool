@@ -6,68 +6,178 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Title="Đăng ký môn HUFLIT" Width="900">
-    <StackPanel>
-        <Grid>
+        Title="Đăng ký môn HUFLIT" 
+        Height="650"
+        Width="1000"
+        Background="#F5F5F5">
+    
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1976D2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#BDBDBD"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <Style TargetType="ListBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#BDBDBD"/>
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+
+        <Style TargetType="RichTextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#BDBDBD"/>
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="Đăng ký môn học HUFLIT" 
+                   FontSize="24" 
+                   FontWeight="Bold" 
+                   Margin="0,0,0,20"/>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
 
-            <StackPanel Margin="30">
-                <ListBox Name="ListBoxState" Height="300" HorizontalAlignment="Stretch" />
-            </StackPanel>
-            <StackPanel Margin="30" Width="300" Grid.Column="1">
-                <Label>Trong kế hoạch</Label>
-                <RichTextBox Name="RtbClassList" Height="100">
-                    <RichTextBox.Resources>
-                        <Style TargetType="{x:Type Paragraph}">
-                            <Setter Property="Margin" Value="0" />
-                        </Style>
-                    </RichTextBox.Resources>
-                </RichTextBox>
-                <Button Name="BtnRun" Click="BtnRun_OnClick" Width="100" Height="30" Margin="0,10,0,0" FontSize="14"
-                        FontWeight="700" Foreground="White"
-                        Background="Gray">
-                    Run
-                </Button>
+            <!-- Left Panel - Class List and Status -->
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <StackPanel Margin="0 20">
-                    <Grid>
-                        <TextBox Name="TbCookie" Height="30" VerticalContentAlignment="Center" FontSize="16"
-                                 VerticalAlignment="Center" />
-                        <TextBlock IsHitTestVisible="False" Text="Nhập cookie" VerticalAlignment="Center"
-                                   HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="DarkGray">
-                            <TextBlock.Style>
-                                <Style TargetType="{x:Type TextBlock}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Text, ElementName=TbCookie}" Value="">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </Grid>
-                    <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal"
-                                HorizontalAlignment="Center" Margin="10">
-                        <RadioButton IsChecked="True" Margin="0 0 10 0" Content="Cookie"
-                                     Checked="PortalCookie_OnChecked" />
-                        <RadioButton Content="PW" Checked="PW_OnChecked" />
-                    </StackPanel>
-                    <Button Name="CheckLoginBtn" Click="BtnCheckLogin_OnClick" Height="30" Width="80" Margin="0 20"
-                            Background="DimGray" Foreground="White">
-                        Check Login
-                    </Button>
-                    <Button Click="ResetButton_OnClick" Height="30" Width="80" Background="DimGray" Foreground="White">
-                        Reset Login
-                    </Button>
+                <StackPanel>
+                    <TextBlock Text="Danh sách lớp cần đăng ký" 
+                               FontSize="16" 
+                               FontWeight="SemiBold"/>
+
+                    <RichTextBox
+                        Name="RtbClassList" 
+                                 Height="200">
+                        <RichTextBox.Resources>
+                            <Style TargetType="{x:Type Paragraph}">
+                            </Style>
+                        </RichTextBox.Resources>
+                    </RichTextBox>
                 </StackPanel>
+
+                <StackPanel Grid.Row="2">
+                    <TextBlock
+                        Text="Trạng thái đăng ký" 
+                               FontSize="16" 
+                               Height="20"
+                               FontWeight="SemiBold" 
+                               Margin="0,10,0,0"/>
+
+                    <ListBox
+                        Name="ListBoxState" 
+                             Height="200" 
+                             Margin="0,10,0,0"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Right Panel - Authentication -->
+            <StackPanel Grid.Column="1" 
+                        Width="300" 
+                        Margin="40,0,0,0">
+                
+                <TextBlock Text="Xác thực" 
+                           FontSize="16" 
+                           FontWeight="SemiBold" 
+                           Margin="0,0,0,10"/>
+
+                <TextBox Name="TbCookie" 
+                         Height="40" 
+                         VerticalContentAlignment="Center" 
+                         FontSize="14"
+                         Margin="0,0,0,15">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Background" Value="#F5F5F5"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+
+                <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Center" 
+                            Margin="0,0,0,15">
+                    <RadioButton Content="Cookie" 
+                                IsChecked="True" 
+                                Margin="0,0,20,0"
+                                Checked="PortalCookie_OnChecked"/>
+                    <RadioButton Content="Tài khoản" 
+                                Checked="PW_OnChecked"/>
+                </StackPanel>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Name="CheckLoginBtn" 
+                            Grid.Row="0"
+                            Content="Kiểm tra đăng nhập" 
+                            Click="BtnCheckLogin_OnClick"
+                            Margin="0,0,0,15"/>
+
+                    <Button Grid.Row="1"
+                            Content="Đặt lại đăng nhập" 
+                            Click="ResetButton_OnClick"
+                            Margin="0,0,0,25"/>
+
+                    <Button Grid.Row="2"
+                            Name="BtnRun" 
+                            Content="Bắt đầu đăng ký" 
+                            Click="BtnRun_OnClick"
+                            FontWeight="Bold"/>
+                </Grid>
             </StackPanel>
         </Grid>
-    </StackPanel>
+    </Grid>
 </Window>

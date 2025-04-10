@@ -79,10 +79,14 @@ public partial class Main
             else { await _huflitPortal.RegisterCookieToServer(); }
 
             _huflitPortal.RunOptimized(listClass, ListBoxState);
-        } catch (Exception)
+        }catch (KeyNotFoundException)
         {
+            MessageBox.Show("Tài khoản phải có đủ User và UserPW", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        } catch (Exception exception)
+        {
+            Console.WriteLine(exception);
             MessageBox.Show("Có lỗi hãy thử lại", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        } 
     }
 
 

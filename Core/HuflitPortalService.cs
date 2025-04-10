@@ -134,7 +134,6 @@ public class HuflitPortal
         {
             _isRegistered.TryAdd(c, false); //mark all class as not registered
         });
-        StartFetchSecret();
         _targetRegisterClass = new List<string>(classListCode);
         var subjectIdList = await GetSubjectIdList(Main.SubscribeType.KH);
         if (subjectIdList == null)
