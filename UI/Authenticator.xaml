@@ -10,7 +10,7 @@
         Title="Đăng ký môn HUFLIT" Height="360" Width="450">
     <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition Height="100" />
+            <RowDefinition Height="100" />  
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>

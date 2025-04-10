@@ -10,7 +10,7 @@ internal static class ImageHelper
         var assembly = Assembly.GetExecutingAssembly();
         var resourceName = $"{assembly.GetName().Name}.Image.{imageName}";
 
-        using var stream = assembly.GetManifestResourceStream(resourceName);
+        var stream = assembly.GetManifestResourceStream(resourceName);
         var bitmap = new BitmapImage();
         bitmap.BeginInit();
         bitmap.StreamSource = stream;

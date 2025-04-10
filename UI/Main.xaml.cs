@@ -4,13 +4,14 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Input;
 using ClassRegisterApp.Models;
 using ClassRegisterApp.Core;
 using ClassRegisterApp.Infrastructure;
 
 namespace ClassRegisterApp.UI;
 
-public partial class Main 
+public partial class Main
 {
     public enum SubscribeType
     {
@@ -47,7 +48,13 @@ public partial class Main
 
     public Main()
     {
-        _huflitPortal = new();
+        _huflitPortal = new HuflitPortal
+        {
+            SubscribeType = _subscribeType
+        };
+        InitializeComponent();
+        WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        Icon = ImageHelper.GetEmbeddedImage("huflit-logo.ico");
     }
 
 
@@ -134,5 +141,33 @@ public partial class Main
     {
         _huflitPortal.IsRegisterCookie = false;
         _huflitPortal.ClearIsRegistered();
+    }
+
+    // Xử lý sự kiện cho custom title bar
+    private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+        {
+            // Double click để maximize/restore window
+            if (WindowState == WindowState.Maximized)
+                WindowState = WindowState.Normal;
+            else
+                WindowState = WindowState.Maximized;
+        }
+        else
+        {
+            // Kéo thả cửa sổ
+            DragMove();
+        }
+    }
+        
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+        
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 }
