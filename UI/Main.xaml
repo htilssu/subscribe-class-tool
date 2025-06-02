@@ -12,9 +12,7 @@
         Width="1100"
         Background="#F0F2F5"
         WindowStyle="None"
-        AllowsTransparency="True"
-        BorderThickness="1"
-        BorderBrush="#DDDDDD">
+        AllowsTransparency="True">
         
     <Window.Resources>
         <!-- Converters -->
@@ -304,8 +302,7 @@
                     <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,15">
                         <Grid>
                             <RichTextBox Name="RtbClassList" 
-                                       Style="{StaticResource ModernRichTextBox}" 
-                                       Height="250">
+                                       Style="{StaticResource ModernRichTextBox}">
                                 <RichTextBox.Resources>
                                     <Style TargetType="{x:Type Paragraph}">
                                         <Setter Property="Margin" Value="0"/>
@@ -319,8 +316,8 @@
                                 </FlowDocument>
                             </RichTextBox>
                             
-                            <TextBlock Text="Nhập danh sách mã lớp, mỗi mã lớp trên một dòng... \n\nVí dụ:\n\nMATH101\nCS102\nENG103" 
-                                     Margin="20,18,0,0" 
+                            <TextBlock Text="Nhập danh sách mã lớp, mỗi mã lớp trên một dòng..." 
+                                     Margin="10,10,0,0" 
                                      Foreground="#757575"
                                      FontStyle="Italic"
                                      IsHitTestVisible="False">
@@ -359,16 +356,7 @@
                             
                             <ListBox Grid.Row="0"
                                    Name="ListBoxState" 
-                                   Style="{StaticResource ModernListBox}" 
-                                   Height="250"/>
-                                   
-                            <ProgressBar Grid.Row="1" 
-                                       Height="6" 
-                                       Margin="0,15,0,0" 
-                                       Name="ProgressStatus" 
-                                       Background="#E0E0E0" 
-                                       Foreground="#4CAF50" 
-                                       Value="0"/>
+                                   Style="{StaticResource ModernListBox}"/>
                         </Grid>
                     </Border>
                 </Grid>
